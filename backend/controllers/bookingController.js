@@ -1,21 +1,17 @@
-const { db } = require('../config/database');
+const { pool } = require('../config/database');
 const { sendBookingConfirmation } = require('../utils/emailTemplates');
 const { calculateTotalPrice, isBookingDeadlinePassed } = require('../utils/helpers');
 
-// Correggi la sezione createBooking (circa riga 15-45):
 const createBooking = async (req, res) => {
   try {
-    // Verifica scadenza
     if (isBookingDeadlinePassed()) {
       return res.status(400).json({ 
         error: 'Scadenza prenotazioni superata' 
       });
     }
 
-    // Estrai i dati dal body (senza email e phone)
     const { name, guests, individualOrders, tableType, totalPrice } = req.body;
     
-    // Verifica posti disponibili
     const availableSpots = await getAvailableSpots();
     if (tableType === 'pool' && guests > availableSpots) {
       return res.status(400).json({ 
@@ -23,7 +19,6 @@ const createBooking = async (req, res) => {
       });
     }
 
-    // Verifica calcolo prezzo
     const calculatedPrice = await calculateTotalPrice(individualOrders, guests);
     if (Math.abs(calculatedPrice - totalPrice) > 0.01) {
       return res.status(400).json({ 
@@ -31,26 +26,23 @@ const createBooking = async (req, res) => {
       });
     }
 
-    // Inserisci prenotazione (QUERY CORRETTA)
-    const stmt = db.prepare(`
-      INSERT INTO bookings (name, guests, individual_orders, table_type, total_price)
-      VALUES (?, ?, ?, ?, ?)
-    `);
-    
-    const result = stmt.run(
-      name,
-      guests, 
-      JSON.stringify(individualOrders),
-      tableType,
-      totalPrice
+    const result = await pool.query(
+      `INSERT INTO bookings (name, guests, individual_orders, table_type, total_price)
+      VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+      [
+        name,
+        guests, 
+        JSON.stringify(individualOrders),
+        tableType,
+        totalPrice
+      ]
     );
 
-    // Risposta di successo
     res.json({
       success: true,
       message: 'Prenotazione creata con successo',
       booking: {
-        id: result.lastInsertRowid,
+        id: result.rows[0].id,
         name,
         guests,
         individualOrders,
@@ -70,19 +62,14 @@ const createBooking = async (req, res) => {
 
 const getAllBookings = async (req, res) => {
   try {
-    const bookings = await new Promise((resolve, reject) => {
-      db.all(`
-        SELECT id, name, email, phone, guests, individual_orders, 
-               table_type, total_price, payment_status, booking_date
-        FROM bookings 
-        ORDER BY booking_date DESC
-      `, (err, rows) => {
-        if (err) reject(err);
-        else resolve(rows);
-      });
-    });
+    const result = await pool.query(
+      `SELECT id, name, email, phone, guests, individual_orders, 
+              table_type, total_price, payment_status, booking_date
+       FROM bookings 
+       ORDER BY booking_date DESC`
+    );
+    const bookings = result.rows;
 
-    // Parse JSON fields
     const parsedBookings = bookings.map(booking => ({
       ...booking,
       individual_orders: JSON.parse(booking.individual_orders || '[]')
@@ -100,14 +87,9 @@ const deleteBooking = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const result = await new Promise((resolve, reject) => {
-      db.run('DELETE FROM bookings WHERE id = ?', [id], function(err) {
-        if (err) reject(err);
-        else resolve({ changes: this.changes });
-      });
-    });
+    const result = await pool.query('DELETE FROM bookings WHERE id = $1 RETURNING id', [id]);
 
-    if (result.changes === 0) {
+    if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Prenotazione non trovata' });
     }
 
@@ -121,19 +103,15 @@ const deleteBooking = async (req, res) => {
 
 const getBookingStats = async (req, res) => {
   try {
-    const stats = await new Promise((resolve, reject) => {
-      db.get(`
-        SELECT 
+    const result = await pool.query(
+      `SELECT 
           COUNT(*) as total_bookings,
           SUM(guests) as total_participants,
           SUM(total_price) as total_revenue,
           AVG(total_price) as avg_booking_value
-        FROM bookings
-      `, (err, row) => {
-        if (err) reject(err);
-        else resolve(row);
-      });
-    });
+       FROM bookings`
+    );
+    const stats = result.rows[0];
 
     const availableSpots = await getAvailableSpots();
     
@@ -152,20 +130,21 @@ const getBookingStats = async (req, res) => {
 };
 
 const getAvailableSpots = async () => {
-  return new Promise((resolve, reject) => {
-    db.get(`
-      SELECT COALESCE(SUM(guests), 0) as used_spots 
-      FROM bookings 
-      WHERE table_type = 'pool'
-    `, (err, row) => {
-      if (err) reject(err);
-      else {
-        const maxSpots = parseInt(process.env.MAX_SPOTS) || 40;
-        const availableSpots = Math.max(0, maxSpots - (row.used_spots || 0));
-        resolve(availableSpots);
-      }
-    });
-  });
+  try {
+    const result = await pool.query(
+      `SELECT COALESCE(SUM(guests), 0) as used_spots 
+       FROM bookings 
+       WHERE table_type = 'pool'`
+    );
+    const row = result.rows[0];
+
+    const maxSpots = parseInt(process.env.MAX_SPOTS) || 40;
+    const availableSpots = Math.max(0, maxSpots - (row.used_spots || 0));
+    return availableSpots;
+  } catch (error) {
+    console.error('Errore nel recupero posti disponibili:', error);
+    throw error;
+  }
 };
 
 module.exports = {
