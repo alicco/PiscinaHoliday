@@ -1,0 +1,2403 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Festa in Piscina - Prenotazioni Holiday</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: url('piscina.jpg') center center/cover no-repeat, linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #00cec9 0%, #00b894 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '🏊‍♀️';
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            font-size: 60px;
+            opacity: 0.3;
+        }
+
+        .header::after {
+            content: '🍕';
+            position: absolute;
+            bottom: 20px;
+            left: 40px;
+            font-size: 60px;
+            opacity: 0.3;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .availability-banner {
+            background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .admin-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #e17055;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 1000;
+            border: none;
+        }
+
+        .admin-panel {
+            display: none;
+            background: #2d3436;
+            color: white;
+            padding: 30px;
+            margin: 20px;
+            border-radius: 15px;
+        }
+
+        .admin-panel.show {
+            display: block;
+        }
+
+        .admin-section {
+            margin-bottom: 30px;
+        }
+
+        .admin-section h3 {
+            margin-bottom: 15px;
+            color: #74b9ff;
+        }
+
+        .participants-list {
+            background: #636e72;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .participant {
+            background: #b2bec3;
+            color: #2d3436;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .menu-editor {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .menu-item-editor {
+            background: #636e72;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .menu-item-editor input {
+            width: 100%;
+            margin: 5px 0;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .content {
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .info-section {
+            background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .info-section h2 {
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .info-item {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-item strong {
+            margin-right: 10px;
+            min-width: 120px;
+        }
+
+        .booking-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+        }
+
+        .booking-section h2 {
+            color: #2d3436;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2d3436;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #0984e3;
+            box-shadow: 0 0 0 3px rgba(9, 132, 227, 0.1);
+        }
+
+        .pizza-menu {
+            grid-column: span 2;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            border: 3px solid #fd79a8;
+        }
+
+        .pizza-menu h2 {
+            color: #e84393;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+
+        .table-selection {
+            grid-column: span 2;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .table-option {
+            background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            text-align: center;
+        }
+
+        .table-option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .table-option.selected {
+            border-color: #00b894;
+            transform: scale(1.05);
+        }
+
+        .table-option h3 {
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .summary {
+            grid-column: span 2;
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .summary h2 {
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .total-price {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .individual-order {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .individual-order h3 {
+            color: #2d3436;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .menu-section {
+            margin-bottom: 20px;
+        }
+
+        .menu-section h4 {
+            color: #e84393;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .mini-menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .mini-menu-item {
+            background: linear-gradient(135deg, #ff7675 0%, #fd79a8 100%);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            text-align: center;
+            font-size: 0.9em;
+            user-select: none;
+            position: relative;
+        }
+
+        .mini-menu-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .mini-menu-item.selected {
+            border-color: #00b894;
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%) !important;
+            box-shadow: 0 0 15px rgba(0, 184, 148, 0.5);
+        }
+        
+        .mini-menu-item.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: white;
+            color: #00b894;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .variants-inline {
+            background: rgba(255, 255, 255, 0.95);
+            color: #2d3436;
+            padding: 8px 5px;
+            border-radius: 5px;
+            margin-top: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .variants-inline label {
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.75em;
+        }
+        
+        .variants-inline input[type="checkbox"] {
+            cursor: pointer;
+            margin-right: 3px;
+        }
+
+        .variants-section {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .variant-checkbox {
+            display: flex;
+            align-items: center;
+            font-size: 0.9em;
+            color: #2d3436;
+        }
+
+        .variant-checkbox input {
+            margin-right: 5px;
+        }
+
+        .btn-admin {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            font-size: 0.9em;
+            padding: 10px 20px;
+            margin: 5px;
+            transition: transform 0.2s ease;
+        }
+        
+        .btn-admin:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .success-message {
+            background: #00b894;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .login-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .login-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .reference-menu-item {
+            padding: 5px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .reference-menu-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Media Queries per Responsività Mobile */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                border-radius: 10px;
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .header p {
+                font-size: 1em;
+            }
+
+            .header::before,
+            .header::after {
+                font-size: 40px;
+            }
+
+            .availability-banner {
+                font-size: 1em;
+                padding: 12px;
+            }
+
+            .admin-toggle {
+                top: 10px;
+                right: 10px;
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+
+            .content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px 15px;
+            }
+
+            .info-section,
+            .booking-section {
+                padding: 20px 15px;
+            }
+
+            .info-section h2,
+            .booking-section h2 {
+                font-size: 1.5em;
+            }
+
+            .pizza-menu,
+            .table-selection,
+            .summary {
+                grid-column: span 1;
+                padding: 20px 15px;
+            }
+
+            .pizza-menu h2 {
+                font-size: 1.5em;
+            }
+
+            .table-selection {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .table-option {
+                padding: 20px 15px;
+            }
+
+            .table-option h3 {
+                font-size: 1.2em;
+            }
+
+            .mini-menu-grid {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .mini-menu-item {
+                padding: 12px;
+                font-size: 0.95em;
+            }
+
+            .total-price {
+                font-size: 2em;
+            }
+
+            .btn {
+                padding: 12px 25px;
+                font-size: 1em;
+                margin: 8px 5px;
+            }
+
+            .admin-panel {
+                margin: 10px;
+                padding: 20px 15px;
+            }
+
+            .menu-editor {
+                grid-template-columns: 1fr;
+            }
+
+            .participants-list {
+                padding: 15px;
+            }
+
+            .participant {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .login-box {
+                margin: 0 15px;
+                padding: 25px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 5px;
+            }
+
+            .header {
+                padding: 15px 10px;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .header::before,
+            .header::after {
+                font-size: 30px;
+            }
+
+            .availability-banner {
+                font-size: 0.9em;
+                padding: 10px;
+                line-height: 1.4;
+            }
+
+            .content {
+                padding: 15px 10px;
+                gap: 15px;
+            }
+
+            .info-section,
+            .booking-section,
+            .pizza-menu,
+            .summary {
+                padding: 15px 10px;
+            }
+
+            .info-section h2,
+            .booking-section h2,
+            .pizza-menu h2,
+            .summary h2 {
+                font-size: 1.3em;
+            }
+
+            .info-item {
+                flex-direction: column;
+                align-items: flex-start;
+                margin-bottom: 10px;
+            }
+
+            .info-item strong {
+                margin-bottom: 5px;
+                min-width: auto;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                font-size: 16px; /* Previene zoom su iOS */
+                padding: 10px;
+            }
+
+            .table-option {
+                padding: 15px 10px;
+            }
+
+            .table-option h3 {
+                font-size: 1.1em;
+            }
+
+            .mini-menu-item {
+                padding: 10px;
+                font-size: 0.9em;
+            }
+
+            .variants-inline {
+                padding: 6px 4px;
+            }
+
+            .variants-inline label {
+                font-size: 0.7em;
+            }
+
+            .total-price {
+                font-size: 1.8em;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.95em;
+                margin: 5px 3px;
+            }
+
+            .admin-toggle {
+                font-size: 11px;
+                padding: 6px 10px;
+            }
+
+            .admin-panel {
+                margin: 5px;
+                padding: 15px 10px;
+            }
+
+            .login-box {
+                margin: 0 10px;
+                padding: 20px 15px;
+            }
+
+            .login-box h2 {
+                font-size: 1.3em;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .header h1 {
+                font-size: 1.3em;
+            }
+
+            .availability-banner {
+                font-size: 0.8em;
+            }
+
+            .info-section h2,
+            .booking-section h2,
+            .pizza-menu h2,
+            .summary h2 {
+                font-size: 1.2em;
+            }
+
+            .total-price {
+                font-size: 1.6em;
+            }
+
+            .btn {
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+        }
+
+        /* Miglioramenti per touch e usabilità mobile */
+        @media (hover: none) and (pointer: coarse) {
+            .mini-menu-item,
+            .table-option,
+            .btn {
+                min-height: 44px; /* Dimensione minima per touch */
+            }
+
+            .admin-toggle {
+                min-height: 40px;
+                min-width: 80px;
+            }
+        }
+
+        /* Orientamento landscape su mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .header {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.6em;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .table-selection {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Panel -->
+    <div class="login-panel" id="login-panel">
+        <div class="login-box">
+            <h2>🔐 Accesso Webmaster</h2>
+            <input type="password" id="admin-password" placeholder="Inserisci password">
+            <br>
+            <button class="btn" onclick="checkPassword()">Accedi</button>
+            <button class="btn" onclick="closeLogin()">Annulla</button>
+        </div>
+    </div>
+
+    <!-- Admin Toggle Button -->
+    <button class="admin-toggle" onclick="showLogin()">👨‍💻 Admin</button>
+
+    <div class="container">
+        <!-- Admin Panel -->
+        <div class="admin-panel" id="admin-panel">
+            <h2>🛠️ Pannello Webmaster</h2>
+            
+            <div class="admin-section">
+                <h3>📊 Statistiche Prenotazioni</h3>
+                <p>Partecipanti registrati: <span id="participants-count">0</span></p>
+                <p>Posti disponibili: <span id="available-spots">40</span>/40</p>
+                <p>Totale pizze/fritti ordinati: <span id="total-pizzas">0</span></p>
+            </div>
+
+            <div class="admin-section">
+                <h3>👥 Lista Partecipanti</h3>
+                <div class="participants-list" id="participants-list">
+                    <p>Nessun partecipante ancora registrato</p>
+                </div>
+            </div>
+
+            <div class="admin-section">
+                <h3>🍕 Editor Menu</h3>
+                <div class="menu-editor" id="menu-editor"></div>
+                <button class="btn btn-admin" onclick="addMenuItem()">+ Aggiungi Pizza</button>
+                <button class="btn btn-admin" onclick="addFrittoItem()">+ Aggiungi Fritto</button>
+                <button class="btn btn-admin" onclick="saveMenu()">💾 Salva Menu</button>
+                <button class="btn btn-admin" onclick="resetMenu()">🔄 Reset Menu</button>
+            </div>
+
+            <div class="admin-section">
+                <h3>📊 Esportazione Dati</h3>
+                <button class="btn btn-admin" onclick="exportBookingsToExcel()" style="background: linear-gradient(135deg, #00b894 0%, #00cec9 100%); margin-right: 10px;">
+                    📋 Esporta Riepilogo Prenotazioni
+                </button>
+                <button class="btn btn-admin" onclick="exportMenuSummaryToExcel()" style="background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);">
+                    🍕 Esporta Riepilogo Menu
+                </button>
+            </div>
+
+            <button class="btn" onclick="closeAdmin()" style="margin-top: 20px;">❌ Chiudi Pannello</button>
+        </div>
+
+        <!-- Availability Banner -->
+        <div class="availability-banner">
+            🎯 Posti Disponibili: <span id="spots-counter">40</span>/40 | ⏰ Scadenza Prenotazioni: 10 Agosto | 💰 Pagamenti alla Bagnina entro il 10 Agosto
+        </div>
+
+        <div class="header">
+            <h1>🍕 Pizza party in Piscina Holiday 12 Agosto ore 20 🏊‍♀️</h1>
+            <p>Complesso Holiday - Montalto di Castro</p>
+        </div>
+
+        <div class="content">
+            <div class="info-section">
+                <h2>📋 Info Festa</h2>
+                <div class="info-item" style="font-size: 1.1em; font-weight: bold;">
+                    <strong>📅 Data:</strong> Martedì 12 Agosto 2025
+                </div>
+                <div class="info-item" style="font-size: 1.1em; font-weight: bold;">
+                    <strong>🕒 Orario:</strong> 20:00 - 23:00
+                </div>
+                <div class="info-item" style="font-size: 1.1em; font-weight: bold;">
+                    <strong>📍 Luogo:</strong> Piscina Condominiale Holiday
+                </div>
+                <div class="info-item" style="font-size: 1.1em; font-weight: bold;">
+                    <strong>🏠 Indirizzo:</strong> Montalto di Castro (VT)
+                </div>
+                <div class="info-item" style="font-size: 1.1em; font-weight: bold;">
+                    <strong>👥 Max posti:</strong> 40 persone (usando tavoli condominiali) - Posti illimitati se porti il tuo tavolo
+                </div>
+                <div class="info-item" style="font-size: 1.1em; font-weight: bold;">
+                    <strong>🏊‍♀️ Include:</strong> Accesso piscina, musica
+                </div>
+                <div class="info-item" style="font-size: 1.1em; font-weight: bold;">
+                    <strong>🍽️ Cena:</strong> Pizza d'asporto dalle 20:30
+                </div>
+            </div>
+
+            
+<!-- Regolamento -->
+<div class="info-section" style="background: linear-gradient(135deg, #e17055 0%, #d63031 100%);">
+    <h2>⚠️ Regolamento Importante</h2>
+    <div style="font-size: 0.95em; line-height: 1.4; font-weight: bold;">
+        <div class="info-item" style="margin-bottom: 12px;">
+            <strong>🗓️ Scadenze:</strong> Prenotazioni online entro il 10 agosto
+        </div>
+        <div class="info-item" style="margin-bottom: 12px;">
+            <strong>💰 Pagamento:</strong> Quote da portare alla bagnina entro il 10 agosto
+        </div>
+        <div class="info-item" style="margin-bottom: 12px;">
+            <strong>📄 Ingresso:</strong> Porta il riepilogo scaricabile alla festa
+        </div>
+        <div class="info-item" style="margin-bottom: 12px;">
+            <strong>🍕 Ordini:</strong> Non si accettano modifiche dopo la conferma
+        </div>
+        <div class="info-item" style="margin-bottom: 12px;">
+            <strong>🥤 Bevande:</strong> Le bevande vanno portate da soli
+        </div>
+        <div class="info-item" style="margin-bottom: 12px;">
+            <strong>🍽️ Stoviglie:</strong> Stoviglie e bicchieri vanno portati da soli
+        </div>
+        <div class="info-item" style="margin-bottom: 12px;">
+            <strong>🎫 Accesso:</strong> Solo con prenotazione confermata
+        </div>
+        <div class="info-item" style="margin-bottom: 12px;">
+            <strong>🏊‍♀️ Quota Bagnina:</strong> Per garantire la presenza della bagnina durante tutta la festa in piscina, chiediamo a ciascun partecipante un contributo aggiuntivo di €3. Se la somma totale raggiungerà i €100, l'obiettivo sarà considerato raggiunto. In caso contrario, verrà richiesto un piccolo conguaglio durante la cena. Eventuali eccedenze saranno accantonate in un fondo cassa.
+        </div>
+    </div>
+</div>
+
+            </div>
+
+            <!-- Registrazione -->
+            <div class="booking-section">
+                <h2>👤 Registrazione</h2>
+                <div class="form-group">
+                    <label for="name">Nome e Cognome *</label>
+                    <input type="text" id="name" placeholder="Mario Rossi">
+                </div>
+                <div class="form-group">
+                    <label for="guests">Numero Ospiti *</label>
+                    <select id="guests">
+                        <option value="">Seleziona...</option>
+                        <option value="1">1 persona</option>
+                        <option value="2">2 persone</option>
+                        <option value="3">3 persone</option>
+                        <option value="4">4 persone</option>
+                        <option value="5">5 persone</option>
+                        <option value="6">6 persone</option>
+                        <option value="7">7 persone</option>
+                        <option value="8">8 persone</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Menu Pizza e Fritti - Ordini Individuali -->
+            <div class="pizza-menu">
+                <h2>🍽️ Ordini Individuali</h2>
+                
+                <!-- Messaggio iniziale -->
+                <div id="no-guests-message" style="text-align: center; color: #666; font-size: 1.1em;">
+                    <p>👆 Prima seleziona il numero di ospiti per procedere con gli ordini</p>
+                </div>
+                
+                <!-- Container per gli ordini individuali -->
+                <div id="individual-orders-container" style="display: none;">
+                    <p style="text-align: center; margin-bottom: 20px; color: #e84393;">
+                        <strong>Seleziona pizza o fritto per ogni partecipante</strong>
+                    </p>
+                    <!-- Le sezioni individuali verranno generate qui -->
+                </div>
+                
+                <!-- Menu di riferimento sempre visibile -->
+                <div style="margin-top: 30px; background: #f8f9fa; padding: 20px; border-radius: 15px;">
+                    <h3 style="text-align: center; color: #2d3436; margin-bottom: 20px;">📋 Menu di Riferimento</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <h4 style="color: #e84393; margin-bottom: 15px;">🍕 Pizze</h4>
+                            <div id="reference-pizza-menu" style="font-size: 0.9em;"></div>
+                        </div>
+                        <div>
+                            <h4 style="color: #e84393; margin-bottom: 15px;">🍟 Fritti</h4>
+                            <div id="reference-fritti-menu" style="font-size: 0.9em;"></div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 15px; text-align: center; font-size: 0.9em; color: #666; border-top: 1px solid #ddd; padding-top: 15px;">
+                        <p><strong>Varianti disponibili solo per le pizze:</strong></p>
+                        <p>🌾 Senza glutine: +€2.00 | 🥛 Senza lattosio: +€1.50</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Selezione Tavolo -->
+            <div class="table-selection">
+                <div class="table-option" data-type="pool" data-price="0">
+                    <h3>🏊‍♀️ Tavolo Condominiale</h3>
+                    <p>Tavoli forniti dal condominio vicino alla piscina</p>
+                    <p><strong>INCLUSO</strong></p>
+                    <p><small>Posti limitati: 40 totali</small></p>
+                </div>
+                <div class="table-option" data-type="personal" data-price="0">
+                    <h3>🪑 Tavolo Personale</h3>
+                    <p>Porta il tuo tavolo e sedie personalizzati</p>
+                    <p><strong>GRATIS</strong></p>
+                    <p><small>Nessun limite di posti</small></p>
+                </div>
+            </div>
+
+            <!-- Riepilogo e Conferma -->
+            <div class="summary">
+                <h2>📋 Riepilogo Prenotazione</h2>
+                <div id="order-summary">
+                    <p>Completa la registrazione per vedere il riepilogo</p>
+                </div>
+                <div class="total-price" id="total-price">€0.00</div>
+                
+                <div style="margin: 30px 0; padding: 20px; background: rgba(255,255,255,0.2); border-radius: 10px;">
+                    <h3 style="margin-bottom: 15px;">💰 Modalità di Pagamento</h3>
+                    <p style="font-size: 1.1em; line-height: 1.4;">
+                        <strong>💵 Contanti alla bagnina entro il 10 agosto</strong><br>
+                        <small>Porta l'importo esatto insieme al riepilogo scaricabile</small>
+                    </p>
+                </div>
+                
+                <button class="btn" id="confirm-booking" disabled>
+                    ✨ CONFERMA PRENOTAZIONE ✨
+                </button>
+                
+                <div class="success-message" id="success-message">
+                    <h3>🎉 Prenotazione Confermata!</h3>
+                    <p>La tua prenotazione è stata registrata correttamente.</p>
+                    <p><strong>IMPORTANTE:</strong> Scarica il riepilogo e portalo alla festa!</p>
+                    <button class="btn" id="download-summary" style="margin-top: 15px; background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);">
+                        📄 SCARICA RIEPILOGO
+                    </button>
+                    <p style="margin-top: 15px; font-size: 0.9em;">
+                        Ricorda: Porta €<span id="final-total">0.00</span> alla bagnina entro il 10 agosto
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="frontend-api-integration.js"></script>
+    <script>
+        // Password webmaster (in produzione dovrebbe essere più sicura)
+        const ADMIN_PASSWORD = "webmaster2025";
+
+        // Stato dell'applicazione
+        let bookingState = {
+            name: '',
+            guests: 0,
+            individualOrders: [], // Array con le scelte di ogni ospite
+            tableType: null,
+            totalPrice: 0
+        };
+
+        // Menu reale Pier Pizza (modificabile dall'admin)
+        let pizzaMenu = [
+            { name: "Focaccia", description: "Sale, olio e rosmarino", price: 6, emoji: "🫓" },
+            { name: "Margherita", description: "Pomodoro, mozzarella, basilico", price: 8, emoji: "🔴" },
+            { name: "Napoli", description: "Pomodoro, alici e mozzarella", price: 8, emoji: "🐟" },
+            { name: "Diavola", description: "Pomodoro, mozzarella, salame piccante", price: 10, emoji: "🌶️" },
+            { name: "Capricciosa", description: "Pomodoro, mozzarella, prosciutto, funghi, uovo, olive, carciofini", price: 10, emoji: "🎭" },
+            { name: "Fiori e Alici", description: "Fiori di zucca, alici e mozzarella", price: 10, emoji: "🌻" },
+            { name: "Pizza Veggie", description: "Pomodori, peperoni, melanzane, zucchine", price: 10, emoji: "🥬" },
+            { name: "Boscaiola Bianca", description: "Funghi, salsiccia e mozzarella", price: 10, emoji: "🍄" },
+            { name: "La Pier", description: "Crudo, bufala, rucola e pachino", price: 10, emoji: "🥩" },
+            { name: "Wrustel e Patatine", description: "Bianca wrustel e patatine fritte", price: 10, emoji: "🌭" }
+        ];
+
+        // Menu fritti
+        let frittiMenu = [
+            { name: "Mini Supplì", description: "Deliziosi supplì al telefono", price: 5, emoji: "🧀" },
+            { name: "Olive Ascolane", description: "Olive ripiene impanate e fritte", price: 5, emoji: "🫒" },
+            { name: "Mozzarelline", description: "Mozzarelline impanate e fritte", price: 5, emoji: "🧈" },
+            { name: "Nuggets Pollo", description: "Bocconcini di pollo impanati", price: 5, emoji: "🍗" }
+        ];
+
+        // Lista partecipanti (in memoria per questa demo)
+        let participants = [];
+
+        // Massimo posti disponibili
+        const MAX_SPOTS = 40;
+
+        // Funzioni Login Admin
+        function showLogin() {
+            document.getElementById('login-panel').style.display = 'flex';
+        }
+
+        function closeLogin() {
+            document.getElementById('login-panel').style.display = 'none';
+            document.getElementById('admin-password').value = '';
+        }
+
+        async function checkPassword() {
+            const password = document.getElementById('admin-password').value;
+            
+            console.log('Tentativo login con password:', password); // Debug
+            
+            try {
+                const result = await api.login(password);
+                console.log('Risultato login:', result); // Debug
+                
+                if (result.token) {
+                    document.getElementById('login-panel').style.display = 'none';
+                    document.getElementById('admin-panel').classList.add('show');
+                    document.getElementById('admin-password').value = '';
+                    
+                    // Nascondi eventuali messaggi di errore precedenti
+                    const errorMsg = document.getElementById('login-error');
+                    if (errorMsg) errorMsg.style.display = 'none';
+                    
+                    // Carica dati dal backend
+                    await loadParticipants();
+                    await loadMenuFromBackend();
+                    await updateAdminStats();
+                    updateParticipantsList();
+                } else {
+                    console.error('Login fallito:', result); // Debug
+                    showLoginError(result.error || 'Password errata!');
+                }
+            } catch (error) {
+                console.error('Errore login completo:', error); // Debug
+                showLoginError('Errore durante il login. Riprova.');
+            }
+        }
+
+        // Funzione per mostrare errori di login
+        function showLoginError(message) {
+            let errorEl = document.getElementById('login-error');
+            if (!errorEl) {
+                errorEl = document.createElement('div');
+                errorEl.id = 'login-error';
+                errorEl.style.color = 'red';
+                errorEl.style.marginTop = '10px';
+                errorEl.style.fontSize = '14px';
+                document.querySelector('.login-box').appendChild(errorEl);
+            }
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+
+        function showAdminPanel() {
+            document.getElementById('admin-panel').classList.add('show');
+            updateAdminStats();
+            updateParticipantsList();
+            renderMenuEditor();
+        }
+
+        // Nuova funzione per caricare i partecipanti dal backend
+        async function loadParticipants() {
+            try {
+                const result = await api.getBookings();
+                if (result.success) {
+                    participants = result.bookings;
+                    updateAvailabilityCounter();
+                }
+            } catch (error) {
+                console.error('Errore caricamento partecipanti:', error);
+            }
+        }
+
+        // Nuova funzione per caricare il menu dal backend
+        async function loadMenuFromBackend() {
+            try {
+                const result = await api.getMenu();
+                if (result.success) {
+                    pizzaMenu = result.data.pizzas;
+                    frittiMenu = result.data.fritti;
+                    renderReferenceMenu();
+                    // Rigenera le sezioni individuali se necessario
+                    if (bookingState.guests > 0) {
+                        generateIndividualOrders();
+                    }
+                }
+            } catch (error) {
+                console.error('Errore caricamento menu:', error);
+            }
+        }
+
+        function closeAdmin() {
+            document.getElementById('admin-panel').classList.remove('show');
+        }
+
+        // Funzioni Admin
+        // Aggiorna updateAdminStats per usare l'API /api/bookings/stats
+        async function updateAdminStats() {
+            try {
+                // Chiama l'API per ottenere le statistiche
+                const statsResult = await api.getBookingStats();
+                
+                if (statsResult.success) {
+                    const stats = statsResult.data;
+                    
+                    // Aggiorna i contatori con i dati dal backend
+                    document.getElementById('participants-count').textContent = stats.totalParticipants || 0;
+                    document.getElementById('available-spots').textContent = Math.max(0, (stats.maxSpots || MAX_SPOTS) - (stats.totalParticipants || 0));
+                    document.getElementById('total-pizzas').textContent = (stats.totalPizzas || 0) + (stats.totalFritti || 0);
+                    
+                    // Se ci sono dettagli del menu, aggiornali
+                    if (stats.menuSummary) {
+                        updateMenuSummaryDisplay(stats.menuSummary);
+                    }
+                } else {
+                    console.error('Errore nel caricamento delle statistiche:', statsResult.error);
+                    // Fallback ai dati locali se l'API fallisce
+                    updateAdminStatsLocal();
+                }
+            } catch (error) {
+                console.error('Errore chiamata API statistiche:', error);
+                // Fallback ai dati locali se l'API fallisce
+                updateAdminStatsLocal();
+            }
+        }
+
+        // Funzione di fallback che usa i dati locali (la vecchia implementazione)
+        function updateAdminStatsLocal() {
+            const totalParticipants = participants.reduce((sum, p) => sum + p.guests, 0);
+            
+            // Conta tutti gli ordini (pizze + fritti multipli)
+            let totalFood = 0;
+            participants.forEach(p => {
+                if (p.individualOrders) {
+                    p.individualOrders.forEach(order => {
+                        if (order.selectedPizzas) {
+                            totalFood += order.selectedPizzas.length;
+                        }
+                        if (order.selectedFritti) {
+                            totalFood += order.selectedFritti.length;
+                        }
+                    });
+                }
+            });
+
+            const availableSpots = Math.max(0, MAX_SPOTS - totalParticipants);
+
+            document.getElementById('participants-count').textContent = totalParticipants;
+            document.getElementById('available-spots').textContent = availableSpots;
+            document.getElementById('total-pizzas').textContent = totalFood;
+        }
+
+        // Funzione per aggiornare la visualizzazione del riepilogo menu
+        function updateMenuSummaryDisplay(menuSummary) {
+            // Cerca se esiste già una sezione per il riepilogo menu
+            let summaryEl = document.getElementById('menu-summary-display');
+            if (!summaryEl) {
+                // Crea la sezione se non esiste
+                summaryEl = document.createElement('div');
+                summaryEl.id = 'menu-summary-display';
+                summaryEl.style.background = '#636e72';
+                summaryEl.style.padding = '15px';
+                summaryEl.style.borderRadius = '10px';
+                summaryEl.style.marginTop = '15px';
+                summaryEl.innerHTML = '<h4>Riepilogo Ordini:</h4>';
+                document.querySelector('.admin-section').appendChild(summaryEl);
+            }
+            
+            let html = '<h4 style="color: #74b9ff; margin-bottom: 15px;">📊 Riepilogo Ordini:</h4>';
+            
+            if (menuSummary.pizzas && Object.keys(menuSummary.pizzas).length > 0) {
+                html += '<h5 style="color: white; margin-bottom: 10px;">🍕 Pizze:</h5><ul style="color: #b2bec3;">';
+                Object.entries(menuSummary.pizzas).forEach(([name, count]) => {
+                    html += `<li style="margin-bottom: 5px;">${name}: <strong>${count}</strong></li>`;
+                });
+                html += '</ul>';
+            }
+            
+            if (menuSummary.fritti && Object.keys(menuSummary.fritti).length > 0) {
+                html += '<h5 style="color: white; margin-bottom: 10px;">🍟 Fritti:</h5><ul style="color: #b2bec3;">';
+                Object.entries(menuSummary.fritti).forEach(([name, count]) => {
+                    html += `<li style="margin-bottom: 5px;">${name}: <strong>${count}</strong></li>`;
+                });
+                html += '</ul>';
+            }
+            
+            summaryEl.innerHTML = html;
+        }
+
+        function updateParticipantsList() {
+            const listEl = document.getElementById('participants-list');
+            if (participants.length === 0) {
+                listEl.innerHTML = '<p>Nessun partecipante ancora registrato</p>';
+                return;
+            }
+
+            let html = '';
+            participants.forEach((p, index) => {
+                let ordersText = '';
+                
+                if (p.individualOrders && p.individualOrders.length > 0) {
+                    ordersText = '<strong>Ordini:</strong><br>';
+                    p.individualOrders.forEach((order, orderIndex) => {
+                        ordersText += `<strong>Partecipante ${orderIndex + 1}:</strong><br>`;
+                        
+                        // Pizze
+                        if (order.selectedPizzas && order.selectedPizzas.length > 0) {
+                            order.selectedPizzas.forEach(pizza => {
+                                let price = pizza.item.price;
+                                ordersText += `  🍕 ${pizza.item.name}`;
+                                if (order.pizzaVariants && order.pizzaVariants[pizza.index]) {
+                                    if (order.pizzaVariants[pizza.index].noGluten) {
+                                        price += 2;
+                                        ordersText += ` (s.glutine)`;
+                                    }
+                                    if (order.pizzaVariants[pizza.index].noLactose) {
+                                        price += 1.5;
+                                        ordersText += ` (s.lattosio)`;
+                                    }
+                                }
+                                ordersText += ` €${price.toFixed(2)}<br>`;
+                            });
+                        }
+                        
+                        // Fritti
+                        if (order.selectedFritti && order.selectedFritti.length > 0) {
+                            order.selectedFritti.forEach(fritto => {
+                                ordersText += `  🍟 ${fritto.item.name} €${fritto.item.price.toFixed(2)}<br>`;
+                            });
+                        }
+                        
+                        if ((!order.selectedPizzas || order.selectedPizzas.length === 0) && 
+                            (!order.selectedFritti || order.selectedFritti.length === 0)) {
+                            ordersText += '  ❌ Nessun ordine<br>';
+                        }
+                    });
+                } else {
+                    ordersText = 'Nessun ordine<br>';
+                }
+
+                // Status pagamento basato sulla data
+                const today = new Date();
+                const deadline = new Date('2025-08-10');
+                const paymentStatus = today <= deadline ? '⏳ Da pagare alla bagnina' : '⚠️ Scadenza pagamento superata';
+
+                html += `
+                    <div class="participant">
+                        <div>
+                            <strong>${p.name}</strong> (${p.guests} ${p.guests === 1 ? 'persona' : 'persone'})<br>
+                            ${ordersText}
+                            🪑 ${p.tableType === 'pool' ? 'Tavolo Condominiale' : 'Tavolo Personale'}<br>
+                            💰 €${p.totalPrice.toFixed(2)} | ${paymentStatus}
+                        </div>
+                        <button onclick="removeParticipant(${index})" style="background: #e17055; color: white; border: none; padding: 5px 10px; border-radius: 5px;">🗑️</button>
+                    </div>
+                `;
+            });
+            listEl.innerHTML = html;
+        }
+
+        function removeParticipant(index) {
+            if (confirm('Sei sicuro di voler rimuovere questo partecipante?')) {
+                participants.splice(index, 1);
+                updateParticipantsList();
+                updateAdminStats();
+                updateAvailabilityCounter();
+            }
+        }
+
+        // Menu Editor
+        function renderMenuEditor() {
+            const editorEl = document.getElementById('menu-editor');
+            let html = '';
+            
+            // Editor per pizze
+            pizzaMenu.forEach((pizza, index) => {
+                html += `
+                    <div class="menu-item-editor">
+                        <h5 style="color: white; margin-bottom: 10px;">Pizza ${index + 1}</h5>
+                        <input type="text" placeholder="Emoji" value="${pizza.emoji}" onchange="updateMenuItem(${index}, 'emoji', this.value, 'pizza')">
+                        <input type="text" placeholder="Nome Pizza" value="${pizza.name}" onchange="updateMenuItem(${index}, 'name', this.value, 'pizza')">
+                        <input type="text" placeholder="Descrizione" value="${pizza.description}" onchange="updateMenuItem(${index}, 'description', this.value, 'pizza')">
+                        <input type="number" placeholder="Prezzo" value="${pizza.price}" onchange="updateMenuItem(${index}, 'price', parseFloat(this.value), 'pizza')">
+                        <button onclick="removeMenuItem(${index}, 'pizza')" style="background: #e17055; color: white; border: none; padding: 8px 12px; border-radius: 5px; margin-top: 10px;">🗑️ Rimuovi</button>
+                    </div>
+                `;
+            });
+            
+            // Editor per fritti
+            frittiMenu.forEach((fritto, index) => {
+                html += `
+                    <div class="menu-item-editor">
+                        <h5 style="color: white; margin-bottom: 10px;">Fritto ${index + 1}</h5>
+                        <input type="text" placeholder="Emoji" value="${fritto.emoji}" onchange="updateMenuItem(${index}, 'emoji', this.value, 'fritto')">
+                        <input type="text" placeholder="Nome Fritto" value="${fritto.name}" onchange="updateMenuItem(${index}, 'name', this.value, 'fritto')">
+                        <input type="text" placeholder="Descrizione" value="${fritto.description}" onchange="updateMenuItem(${index}, 'description', this.value, 'fritto')">
+                        <input type="number" placeholder="Prezzo" value="${fritto.price}" onchange="updateMenuItem(${index}, 'price', parseFloat(this.value), 'fritto')">
+                        <button onclick="removeMenuItem(${index}, 'fritto')" style="background: #e17055; color: white; border: none; padding: 8px 12px; border-radius: 5px; margin-top: 10px;">🗑️ Rimuovi</button>
+                    </div>
+                `;
+            });
+            
+            editorEl.innerHTML = html;
+        }
+
+        function updateMenuItem(index, field, value, type) {
+            if (type === 'pizza') {
+                pizzaMenu[index][field] = value;
+            } else {
+                frittiMenu[index][field] = value;
+            }
+        }
+
+        function addMenuItem() {
+            pizzaMenu.push({
+                name: "Nuova Pizza",
+                description: "Descrizione...",
+                price: 10,
+                emoji: "🍕"
+            });
+            renderMenuEditor();
+            renderReferenceMenu();
+        }
+
+        function addFrittoItem() {
+            frittiMenu.push({
+                name: "Nuovo Fritto",
+                description: "Descrizione...",
+                price: 5,
+                emoji: "🍟"
+            });
+            renderMenuEditor();
+            renderReferenceMenu();
+        }
+
+        function removeMenuItem(index, type) {
+            if (type === 'pizza') {
+                pizzaMenu.splice(index, 1);
+            } else {
+                frittiMenu.splice(index, 1);
+            }
+            renderMenuEditor();
+            renderReferenceMenu();
+        }
+
+        async function saveMenu() {
+            try {
+                await api.updateMenu(pizzaMenu, frittiMenu);
+                alert('Menu aggiornato con successo!');
+                renderReferenceMenu();
+                
+                // Rigenera le sezioni individuali se necessario
+                if (bookingState.guests > 0) {
+                    generateIndividualOrders();
+                }
+            } catch (error) {
+                console.error('Errore salvataggio menu:', error);
+                alert('Errore durante il salvataggio del menu');
+            }
+        }
+
+        function resetMenu() {
+            if (confirm('Sei sicuro di voler ripristinare il menu originale?')) {
+                pizzaMenu = [
+                    { name: "Focaccia", description: "Sale, olio e rosmarino", price: 6, emoji: "🫓" },
+                    { name: "Margherita", description: "Pomodoro, mozzarella, basilico", price: 8, emoji: "🔴" },
+                    { name: "Napoli", description: "Pomodoro, alici e mozzarella", price: 8, emoji: "🐟" },
+                    { name: "Diavola", description: "Pomodoro, mozzarella, salame piccante", price: 10, emoji: "🌶️" },
+                    { name: "Capricciosa", description: "Pomodoro, mozzarella, prosciutto, funghi, uovo, olive, carciofini", price: 10, emoji: "🎭" },
+                    { name: "Fiori e Alici", description: "Fiori di zucca, alici e mozzarella", price: 10, emoji: "🌻" },
+                    { name: "Pizza Veggie", description: "Pomodori, peperoni, melanzane, zucchine", price: 10, emoji: "🥬" },
+                    { name: "Boscaiola Bianca", description: "Funghi, salsiccia e mozzarella", price: 10, emoji: "🍄" },
+                    { name: "La Pier", description: "Crudo, bufala, rucola e pachino", price: 10, emoji: "🥩" },
+                    { name: "Wrustel e Patatine", description: "Bianca wrustel e patatine fritte", price: 10, emoji: "🌭" }
+                ];
+                frittiMenu = [
+                    { name: "Mini Supplì", description: "Deliziosi supplì al telefono", price: 5, emoji: "🧀" },
+                    { name: "Olive Ascolane", description: "Olive ripiene impanate e fritte", price: 5, emoji: "🫒" },
+                    { name: "Mozzarelline", description: "Mozzarelline impanate e fritte", price: 5, emoji: "🧈" },
+                    { name: "Nuggets Pollo", description: "Bocconcini di pollo impanati", price: 5, emoji: "🍗" }
+                ];
+                renderMenuEditor();
+                renderReferenceMenu();
+                generateIndividualOrders(); // Rigenera gli ordini con il menu originale
+            }
+        }
+
+        // Rendering del menu di riferimento
+        function renderReferenceMenu() {
+            // Render pizze nel menu di riferimento
+            const pizzaRefEl = document.getElementById('reference-pizza-menu');
+            if (pizzaRefEl) {
+                let pizzaHtml = '';
+                pizzaMenu.forEach((pizza) => {
+                    pizzaHtml += `
+                        <div class="reference-menu-item">
+                            <strong>${pizza.emoji} ${pizza.name}</strong> - €${pizza.price.toFixed(2)}<br>
+                            <small style="color: #666;">${pizza.description}</small>
+                        </div>
+                    `;
+                });
+                pizzaRefEl.innerHTML = pizzaHtml;
+            }
+
+            // Render fritti nel menu di riferimento
+            const frittiRefEl = document.getElementById('reference-fritti-menu');
+            if (frittiRefEl) {
+                let frittiHtml = '';
+                frittiMenu.forEach((fritto) => {
+                    frittiHtml += `
+                        <div class="reference-menu-item">
+                            <strong>${fritto.emoji} ${fritto.name}</strong> - €${fritto.price.toFixed(2)}<br>
+                            <small style="color: #666;">${fritto.description}</small>
+                        </div>
+                    `;
+                });
+                frittiRefEl.innerHTML = frittiHtml;
+            }
+        }
+
+        // Aggiornamento contatore disponibilità con controlli di sicurezza
+        function updateAvailabilityCounter() {
+            const spotsCounterEl = document.getElementById('spots-counter');
+            const bannerEl = document.querySelector('.availability-banner');
+            
+            if (!spotsCounterEl || !bannerEl) {
+                console.log('Elementi contatore non ancora disponibili');
+                return;
+            }
+            
+            const totalParticipants = participants.reduce((sum, p) => sum + p.guests, 0);
+            const availableSpots = Math.max(0, MAX_SPOTS - totalParticipants);
+            spotsCounterEl.textContent = availableSpots;
+            
+            const today = new Date();
+            const deadline = new Date('2025-08-10');
+            const msPerDay = 24 * 60 * 60 * 1000;
+            const daysLeft = Math.ceil((deadline - today) / msPerDay);
+            
+            // Cambia colore banner in base ai posti e alla scadenza
+            if (availableSpots <= 5 || daysLeft <= 3) {
+                bannerEl.style.background = 'linear-gradient(135deg, #e17055 0%, #d63031 100%)';
+                if (daysLeft <= 0) {
+                    bannerEl.innerHTML = '🚫 PRENOTAZIONI CHIUSE - Scadenza superata';
+                } else if (daysLeft <= 3) {
+                    bannerEl.innerHTML = `🎯 Posti: ${availableSpots}/40 | ⚠️ ULTIMI ${daysLeft} GIORNI per prenotare!`;
+                }
+            } else {
+                bannerEl.innerHTML = `🎯 Posti Disponibili: ${availableSpots}/40 | ⏰ Scadenza: 10 Agosto | 💰 Pagamenti alla Bagnina entro il 10 Agosto`;
+            }
+            
+            // Disabilita prenotazioni se scadenza superata
+            if (daysLeft <= 0) {
+                const confirmBtn = document.getElementById('confirm-booking');
+                if (confirmBtn) {
+                    confirmBtn.disabled = true;
+                    confirmBtn.textContent = '❌ PRENOTAZIONI CHIUSE';
+                }
+            }
+        }
+
+        // Gestione selezione tavolo
+        document.querySelectorAll('.table-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.table-option').forEach(t => t.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                bookingState.tableType = {
+                    type: this.dataset.type,
+                    price: parseFloat(this.dataset.price)
+                };
+                updateSummary();
+            });
+        });
+
+        // Funzione per generare e scaricare il riepilogo
+        function downloadSummary() {
+            const participant = participants[participants.length - 1]; // Ultimo partecipante aggiunto
+            
+            let content = `🏊‍♀️ FESTA IN PISCINA - HOLIDAY MONTALTO DI CASTRO 🍕
+═══════════════════════════════════════════════════
+
+📅 DATA: Martedì 12 Agosto 2025
+🕒 ORARIO: 20:00 - 23:00
+📍 LUOGO: Piscina Condominiale Holiday, Montalto di Castro (VT)
+
+═══════════════════════════════════════════════════
+👤 DATI PRENOTAZIONE
+═══════════════════════════════════════════════════
+
+Nome: ${participant.name}
+Numero partecipanti: ${participant.guests} ${participant.guests === 1 ? 'persona' : 'persone'}
+
+═══════════════════════════════════════════════════
+🍽️ ORDINI CONFERMATI
+═══════════════════════════════════════════════════
+
+`;
+
+            if (participant.individualOrders) {
+                participant.individualOrders.forEach((order, index) => {
+                    content += `\nPARTECIPANTE ${index + 1}:\n`;
+                    
+                    let guestTotal = 0;
+                    
+                    // Pizze
+                    if (order.selectedPizzas && order.selectedPizzas.length > 0) {
+                        order.selectedPizzas.forEach(pizza => {
+                            let price = pizza.item.price;
+                            content += `  🍕 ${pizza.item.name}`;
+                            
+                            if (order.pizzaVariants && order.pizzaVariants[pizza.index]) {
+                                let variants = [];
+                                if (order.pizzaVariants[pizza.index].noGluten) {
+                                    price += 2;
+                                    variants.push('senza glutine +€2.00');
+                                }
+                                if (order.pizzaVariants[pizza.index].noLactose) {
+                                    price += 1.5;
+                                    variants.push('senza lattosio +€1.50');
+                                }
+                                if (variants.length > 0) {
+                                    content += ` (${variants.join(', ')})`;
+                                }
+                            }
+                            
+                            content += ` - €${price.toFixed(2)}\n`;
+                            guestTotal += price;
+                        });
+                    }
+                    
+                    // Fritti
+                    if (order.selectedFritti && order.selectedFritti.length > 0) {
+                        order.selectedFritti.forEach(fritto => {
+                            content += `  🍟 ${fritto.item.name} - €${fritto.item.price.toFixed(2)}\n`;
+                            guestTotal += fritto.item.price;
+                        });
+                    }
+                    
+                    if (guestTotal > 0) {
+                        content += `  Subtotale: €${guestTotal.toFixed(2)}\n`;
+                    } else {
+                        content += `  Nessun ordine selezionato\n`;
+                    }
+                });
+            }
+
+            content += `
+═══════════════════════════════════════════════════
+🪑 SISTEMAZIONE
+═══════════════════════════════════════════════════
+
+${participant.tableType === 'pool' ? '🏊‍♀️ Tavolo Condominiale (INCLUSO)' : '🪑 Tavolo Personale (GRATIS)'}
+
+═══════════════════════════════════════════════════
+🏊‍♀️ QUOTA BAGNINA
+═══════════════════════════════════════════════════
+
+Quota permanenza bagnina: ${participant.guests} partecipant${participant.guests === 1 ? 'e' : 'i'} × €3.00 = €${(participant.guests * 3).toFixed(2)}
+
+• Contributo di €3.00 per partecipante per raggiungere
+  la quota di €100.00 per la permanenza del bagnino
+• Se non si raggiunge €100.00, il saldo sarà richiesto a cena
+• Eventuali eccedenze andranno in cassa comune
+
+═══════════════════════════════════════════════════
+💰 RIEPILOGO PAGAMENTO
+═══════════════════════════════════════════════════
+
+TOTALE DA PAGARE: €${participant.totalPrice.toFixed(2)}
+
+⚠️  IMPORTANTE:
+• Porta questo riepilogo alla festa per l'ingresso
+• Consegna €${participant.totalPrice.toFixed(2)} alla bagnina ENTRO IL 10 AGOSTO
+• Senza pagamento anticipato non sarà possibile partecipare
+• Non si accettano modifiche agli ordini dopo la conferma
+
+═══════════════════════════════════════════════════
+✅ PRENOTAZIONE VALIDA
+═══════════════════════════════════════════════════
+
+Codice prenotazione: ${participant.timestamp}
+Data conferma: ${new Date(participant.timestamp).toLocaleString('it-IT')}
+
+Ci vediamo alla festa! 🏊‍♀️🍕✨`;
+
+            // Crea e scarica il file
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Prenotazione_Festa_Piscina_${participant.name.replace(/\s+/g, '_')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Gestione input form
+        ['name'].forEach(field => {
+            document.getElementById(field).addEventListener('input', function() {
+                bookingState[field] = this.value;
+                console.log(`${field} aggiornato:`, this.value);
+                updateSummary();
+            });
+        });
+
+        document.getElementById('guests').addEventListener('change', function() {
+            const newGuestCount = parseInt(this.value) || 0;
+            console.log('Numero ospiti selezionato:', newGuestCount);
+            bookingState.guests = newGuestCount;
+            
+            // Genera immediatamente le sezioni per gli ordini
+            generateIndividualOrders();
+            updateSummary();
+            
+            console.log('Sezioni ordini generate per', newGuestCount, 'ospiti');
+        });
+
+        // Genera le sezioni per gli ordini individuali
+        function generateIndividualOrders() {
+            console.log('generateIndividualOrders chiamata con', bookingState.guests, 'ospiti');
+            
+            const container = document.getElementById('individual-orders-container');
+            const noGuestsMessage = document.getElementById('no-guests-message');
+            
+            if (!container) {
+                console.error('Container individual-orders-container non trovato!');
+                return;
+            }
+            if (!noGuestsMessage) {
+                console.error('Elemento no-guests-message non trovato!');
+                return;
+            }
+            
+            if (bookingState.guests === 0) {
+                console.log('Nascondo container ordini, mostro messaggio no guests');
+                container.style.display = 'none';
+                noGuestsMessage.style.display = 'block';
+                bookingState.individualOrders = [];
+                return;
+            }
+            
+            console.log('Mostro container ordini, nascondo messaggio no guests');
+            container.style.display = 'block';
+            noGuestsMessage.style.display = 'none';
+            
+            // Inizializza gli ordini individuali con array per selezioni multiple
+            console.log('Inizializzo ordini individuali per', bookingState.guests, 'ospiti');
+            bookingState.individualOrders = Array.from({length: bookingState.guests}, (_, i) => {
+                return bookingState.individualOrders[i] || {
+                    selectedPizzas: [], // Array per pizze multiple
+                    selectedFritti: [], // Array per fritti multipli
+                    pizzaVariants: {} // Oggetto per varianti di ogni pizza
+                };
+            });
+            
+            let html = '<p style="text-align: center; margin-bottom: 30px; color: #e84393; font-weight: bold; font-size: 1.1em;">Seleziona pizze e/o fritti per ogni partecipante (puoi scegliere più opzioni)</p>';
+            
+            for (let i = 0; i < bookingState.guests; i++) {
+                html += `
+                    <div class="individual-order">
+                        <h3>👤 Partecipante ${i + 1}</h3>
+                        
+                        <div class="menu-section">
+                            <h4>🍕 Pizze <small style="color: #666;">(clicca per selezionare/deselezionare)</small></h4>
+                            <div class="mini-menu-grid">
+                                ${pizzaMenu.map((pizza, index) => `
+                                    <div class="mini-menu-item" data-guest="${i}" data-type="pizza" data-index="${index}">
+                                        <div><strong>${pizza.emoji} ${pizza.name}</strong></div>
+                                        <div>€${pizza.price.toFixed(2)}</div>
+                                        <div class="variants-inline" id="pizza-variants-${i}-${index}" style="display: none; margin-top: 5px; font-size: 0.8em;">
+                                            <label style="margin-right: 10px;">
+                                                <input type="checkbox" data-guest="${i}" data-pizza="${index}" data-variant="noGluten">
+                                                🌾 S.Glutine +€2
+                                            </label>
+                                            <label>
+                                                <input type="checkbox" data-guest="${i}" data-pizza="${index}" data-variant="noLactose">
+                                                🥛 S.Lattosio +€1.50
+                                            </label>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="menu-section">
+                            <h4>🍟 Fritti <small style="color: #666;">(clicca per selezionare/deselezionare)</small></h4>
+                            <div class="mini-menu-grid">
+                                ${frittiMenu.map((fritto, index) => `
+                                    <div class="mini-menu-item" data-guest="${i}" data-type="fritto" data-index="${index}">
+                                        <div><strong>${fritto.emoji} ${fritto.name}</strong></div>
+                                        <div>€${fritto.price.toFixed(2)}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 15px; padding: 10px; background: #f0f0f0; border-radius: 8px; text-align: center;">
+                            <strong>Totale Partecipante ${i + 1}: €<span id="guest-total-${i}">0.00</span></strong>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            console.log('Inserisco HTML nel container, lunghezza:', html.length);
+            container.innerHTML = html;
+            
+            console.log('Chiamo addIndividualOrderListeners');
+            addIndividualOrderListeners();
+            
+            // Aggiorna il riepilogo dopo aver generato gli ordini
+            updateSummary();
+        }
+
+        // Aggiungi event listeners per gli ordini individuali
+        function addIndividualOrderListeners() {
+            // Event listeners per le pizze (selezioni multiple)
+            document.querySelectorAll('.mini-menu-item[data-type="pizza"]').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    // Previeni che il click sulle checkbox triggeri l'evento del parent
+                    if (e.target.type === 'checkbox') return;
+                    
+                    const guestIndex = parseInt(this.dataset.guest);
+                    const itemIndex = parseInt(this.dataset.index);
+                    
+                    // Assicurati che l'array esista
+                    if (!bookingState.individualOrders[guestIndex]) {
+                        bookingState.individualOrders[guestIndex] = {
+                            selectedPizzas: [],
+                            selectedFritti: [],
+                            pizzaVariants: {}
+                        };
+                    }
+                    
+                    // Toggle della selezione
+                    if (this.classList.contains('selected')) {
+                        // Deseleziona
+                        this.classList.remove('selected');
+                        // Rimuovi dall'array
+                        const idx = bookingState.individualOrders[guestIndex].selectedPizzas.findIndex(p => p.index === itemIndex);
+                        if (idx > -1) {
+                            bookingState.individualOrders[guestIndex].selectedPizzas.splice(idx, 1);
+                            delete bookingState.individualOrders[guestIndex].pizzaVariants[itemIndex];
+                        }
+                        // Nascondi varianti per questa pizza
+                        const variantsEl = document.getElementById(`pizza-variants-${guestIndex}-${itemIndex}`);
+                        if (variantsEl) {
+                            variantsEl.style.display = 'none';
+                            // Reset checkboxes
+                            variantsEl.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+                        }
+                    } else {
+                        // Seleziona
+                        this.classList.add('selected');
+                        // Aggiungi all'array se non esiste già
+                        const exists = bookingState.individualOrders[guestIndex].selectedPizzas.find(p => p.index === itemIndex);
+                        if (!exists) {
+                            bookingState.individualOrders[guestIndex].selectedPizzas.push({
+                                index: itemIndex,
+                                item: pizzaMenu[itemIndex]
+                            });
+                        }
+                        // Inizializza varianti per questa pizza
+                        if (!bookingState.individualOrders[guestIndex].pizzaVariants[itemIndex]) {
+                            bookingState.individualOrders[guestIndex].pizzaVariants[itemIndex] = {
+                                noGluten: false,
+                                noLactose: false
+                            };
+                        }
+                        // Mostra varianti per questa pizza
+                        const variantsEl = document.getElementById(`pizza-variants-${guestIndex}-${itemIndex}`);
+                        if (variantsEl) {
+                            variantsEl.style.display = 'block';
+                        }
+                    }
+                    
+                    console.log('Pizze aggiornate per ospite', guestIndex, ':', bookingState.individualOrders[guestIndex].selectedPizzas);
+                    updateGuestTotal(guestIndex);
+                    updateSummary();
+                });
+            });
+            
+            // Event listeners per i fritti (selezioni multiple)
+            document.querySelectorAll('.mini-menu-item[data-type="fritto"]').forEach(item => {
+                item.addEventListener('click', function() {
+                    const guestIndex = parseInt(this.dataset.guest);
+                    const itemIndex = parseInt(this.dataset.index);
+                    
+                    // Assicurati che l'array esista
+                    if (!bookingState.individualOrders[guestIndex]) {
+                        bookingState.individualOrders[guestIndex] = {
+                            selectedPizzas: [],
+                            selectedFritti: [],
+                            pizzaVariants: {}
+                        };
+                    }
+                    
+                    // Toggle della selezione
+                    if (this.classList.contains('selected')) {
+                        // Deseleziona
+                        this.classList.remove('selected');
+                        // Rimuovi dall'array
+                        const idx = bookingState.individualOrders[guestIndex].selectedFritti.findIndex(f => f.index === itemIndex);
+                        if (idx > -1) {
+                            bookingState.individualOrders[guestIndex].selectedFritti.splice(idx, 1);
+                        }
+                    } else {
+                        // Seleziona
+                        this.classList.add('selected');
+                        // Aggiungi all'array se non esiste già
+                        const exists = bookingState.individualOrders[guestIndex].selectedFritti.find(f => f.index === itemIndex);
+                        if (!exists) {
+                            bookingState.individualOrders[guestIndex].selectedFritti.push({
+                                index: itemIndex,
+                                item: frittiMenu[itemIndex]
+                            });
+                        }
+                    }
+                    
+                    console.log('Fritti aggiornati per ospite', guestIndex, ':', bookingState.individualOrders[guestIndex].selectedFritti);
+                    updateGuestTotal(guestIndex);
+                    updateSummary();
+                });
+            });
+            
+            // Event listeners per le varianti delle pizze
+            document.querySelectorAll('input[data-variant]').forEach(checkbox => {
+                checkbox.addEventListener('change', function(e) {
+                    e.stopPropagation(); // Previeni che il click triggeri l'evento del parent
+                    
+                    const guestIndex = parseInt(this.dataset.guest);
+                    const pizzaIndex = parseInt(this.dataset.pizza);
+                    const variant = this.dataset.variant;
+                    
+                    // Assicurati che la struttura esista
+                    if (!bookingState.individualOrders[guestIndex]) {
+                        bookingState.individualOrders[guestIndex] = {
+                            selectedPizzas: [],
+                            selectedFritti: [],
+                            pizzaVariants: {}
+                        };
+                    }
+                    
+                    if (!bookingState.individualOrders[guestIndex].pizzaVariants[pizzaIndex]) {
+                        bookingState.individualOrders[guestIndex].pizzaVariants[pizzaIndex] = {
+                            noGluten: false,
+                            noLactose: false
+                        };
+                    }
+                    
+                    // Aggiorna le varianti per la pizza specifica
+                    bookingState.individualOrders[guestIndex].pizzaVariants[pizzaIndex][variant] = this.checked;
+                    console.log('Variante aggiornata:', guestIndex, pizzaIndex, variant, this.checked);
+                    updateGuestTotal(guestIndex);
+                    updateSummary();
+                });
+            });
+        }
+        
+        // Nuova funzione per aggiornare il totale di un singolo ospite
+        function updateGuestTotal(guestIndex) {
+            if (!bookingState.individualOrders[guestIndex]) return;
+            
+            let total = 0;
+            const order = bookingState.individualOrders[guestIndex];
+            
+            // Calcola totale pizze con varianti
+            if (order.selectedPizzas) {
+                order.selectedPizzas.forEach(pizza => {
+                    let pizzaPrice = pizza.item.price;
+                    if (order.pizzaVariants && order.pizzaVariants[pizza.index]) {
+                        if (order.pizzaVariants[pizza.index].noGluten) pizzaPrice += 2;
+                        if (order.pizzaVariants[pizza.index].noLactose) pizzaPrice += 1.5;
+                    }
+                    total += pizzaPrice;
+                });
+            }
+            
+            // Calcola totale fritti
+            if (order.selectedFritti) {
+                order.selectedFritti.forEach(fritto => {
+                    total += fritto.item.price;
+                });
+            }
+            
+            // Aggiorna il display del totale
+            const totalEl = document.getElementById(`guest-total-${guestIndex}`);
+            if (totalEl) {
+                totalEl.textContent = total.toFixed(2);
+            }
+        }
+
+        // Funzione per aggiornare il riepilogo con controlli di sicurezza
+        function updateSummary() {
+            const summary = document.getElementById('order-summary');
+            const totalEl = document.getElementById('total-price');
+            const confirmBtn = document.getElementById('confirm-booking');
+            
+            // Se gli elementi non esistono ancora, non fare nulla
+            if (!summary || !totalEl || !confirmBtn) {
+                console.log('Elementi summary non ancora disponibili');
+                return;
+            }
+            
+            let total = 0;
+            let summaryHTML = '';
+
+            // Controllo posti disponibili
+            const totalParticipants = participants.reduce((sum, p) => sum + p.guests, 0);
+            const availableSpots = MAX_SPOTS - totalParticipants;
+            
+            if (bookingState.guests > 0 && bookingState.tableType?.type === 'pool' && bookingState.guests > availableSpots) {
+                summary.innerHTML = `<p style="color: #ff6b6b;">❌ Non ci sono abbastanza posti disponibili! Rimangono solo ${availableSpots} posti con tavoli condominiali.</p>`;
+                totalEl.textContent = '€0.00';
+                confirmBtn.disabled = true;
+                return;
+            }
+
+            // Controllo dati base
+            if (!bookingState.name || bookingState.guests === 0) {
+                // Mostra almeno la quota bagnina se è stato selezionato il numero di ospiti
+                if (bookingState.guests > 0) {
+                    const quotaBagnina = bookingState.guests * 3;
+                    summary.innerHTML = `
+                        <p>Completa la registrazione per vedere il riepilogo completo</p>
+                        <div style="text-align: left; margin: 15px 0; background: #e8f5e8; padding: 10px; border-radius: 5px;">
+                            🏊‍♀️ <strong>Quota Bagnina:</strong> ${bookingState.guests} partecipant${bookingState.guests === 1 ? 'e' : 'i'} × €3.00 = €${quotaBagnina.toFixed(2)}
+                        </div>
+                    `;
+                    totalEl.textContent = `€${quotaBagnina.toFixed(2)}`;
+                } else {
+                    summary.innerHTML = '<p>Completa la registrazione per vedere il riepilogo</p>';
+                    totalEl.textContent = '€0.00';
+                }
+                confirmBtn.disabled = true;
+                return;
+            }
+
+            summaryHTML += `<div style="text-align: left; margin-bottom: 15px;">`;
+            summaryHTML += `<strong>👤 ${bookingState.name}</strong><br>`;
+            summaryHTML += `👥 ${bookingState.guests} ${bookingState.guests === 1 ? 'persona' : 'persone'}`;
+            summaryHTML += `</div>`;
+
+            // Ordini individuali (selezioni multiple)
+            let hasOrders = false;
+            if (bookingState.individualOrders && bookingState.individualOrders.length > 0) {
+                summaryHTML += `<div style="text-align: left; margin-bottom: 15px;"><strong>🍽️ Ordini:</strong><br>`;
+                
+                bookingState.individualOrders.forEach((order, index) => {
+                    let guestTotal = 0;
+                    let guestOrders = [];
+                    
+                    // Aggiungi pizze
+                    if (order.selectedPizzas && order.selectedPizzas.length > 0) {
+                        order.selectedPizzas.forEach(pizza => {
+                            let pizzaPrice = pizza.item.price;
+                            let pizzaText = `🍕 ${pizza.item.name}`;
+                            
+                            // Aggiungi varianti
+                            if (order.pizzaVariants && order.pizzaVariants[pizza.index]) {
+                                let variants = [];
+                                if (order.pizzaVariants[pizza.index].noGluten) {
+                                    pizzaPrice += 2;
+                                    variants.push('s.glutine');
+                                }
+                                if (order.pizzaVariants[pizza.index].noLactose) {
+                                    pizzaPrice += 1.5;
+                                    variants.push('s.lattosio');
+                                }
+                                if (variants.length > 0) {
+                                    pizzaText += ` (${variants.join(', ')})`;
+                                }
+                            }
+                            
+                            pizzaText += ` = €${pizzaPrice.toFixed(2)}`;
+                            guestOrders.push(pizzaText);
+                            guestTotal += pizzaPrice;
+                            hasOrders = true;
+                        });
+                    }
+                    
+                    // Aggiungi fritti
+                    if (order.selectedFritti && order.selectedFritti.length > 0) {
+                        order.selectedFritti.forEach(fritto => {
+                            let frittoText = `🍟 ${fritto.item.name} = €${fritto.item.price.toFixed(2)}`;
+                            guestOrders.push(frittoText);
+                            guestTotal += fritto.item.price;
+                            hasOrders = true;
+                        });
+                    }
+                    
+                    // Mostra riepilogo per questo ospite
+                    summaryHTML += `<strong>Partecipante ${index + 1}:</strong><br>`;
+                    if (guestOrders.length > 0) {
+                        guestOrders.forEach(orderText => {
+                            summaryHTML += `  ${orderText}<br>`;
+                        });
+                        summaryHTML += `  <strong>Subtotale: €${guestTotal.toFixed(2)}</strong><br>`;
+                    } else {
+                        summaryHTML += `  ❌ Nessun ordine selezionato<br>`;
+                    }
+                    summaryHTML += `  🏊‍♀️ <em>Quota Bagnina: €3.00</em><br>`;
+                    summaryHTML += `<br>`;
+                    
+                    total += guestTotal;
+                });
+                
+                summaryHTML += `</div>`;
+            }
+
+            // Quota Bagnina
+            const quotaBagnina = bookingState.guests * 3;
+            summaryHTML += `<div style="text-align: left; margin-bottom: 10px; background: #e8f5e8; padding: 10px; border-radius: 5px;">`;
+            summaryHTML += `🏊‍♀️ <strong>Quota Bagnina:</strong> ${bookingState.guests} partecipant${bookingState.guests === 1 ? 'e' : 'i'} × €3.00 = €${quotaBagnina.toFixed(2)}`;
+            summaryHTML += `</div>`;
+            
+            total += quotaBagnina;
+
+            // Tavolo
+            if (bookingState.tableType) {
+                summaryHTML += `<div style="text-align: left; margin-bottom: 10px;">`;
+                if (bookingState.tableType.type === 'pool') {
+                    summaryHTML += `🏊‍♀️ Tavolo Condominiale = INCLUSO`;
+                } else {
+                    summaryHTML += `🪑 Tavolo Personale = GRATIS`;
+                }
+                summaryHTML += `</div>`;
+                
+                summaryHTML += `<div style="text-align: left; margin-bottom: 10px; color: #ff6b6b; font-weight: bold;">`;
+                summaryHTML += `💰 Totale da portare alla bagnina: €${total.toFixed(2)}`;
+                summaryHTML += `</div>`;
+            }
+
+            bookingState.totalPrice = total;
+            summary.innerHTML = summaryHTML;
+            totalEl.textContent = `€${total.toFixed(2)}`;
+
+            // Verifica se almeno un ospite ha selezionato qualcosa
+            const atLeastOneOrder = bookingState.individualOrders && bookingState.individualOrders.length > 0 &&
+                bookingState.individualOrders.some(order => 
+                    (order.selectedPizzas && order.selectedPizzas.length > 0) || 
+                    (order.selectedFritti && order.selectedFritti.length > 0)
+                );
+
+            // Abilita il pulsante se tutto è compilato
+            const canConfirm = bookingState.name && 
+                             bookingState.guests > 0 && 
+                             atLeastOneOrder &&
+                             bookingState.tableType;
+            
+            confirmBtn.disabled = !canConfirm;
+        }
+
+        // Gestione conferma prenotazione
+        document.getElementById('confirm-booking').addEventListener('click', async function() {
+            const bookingData = {
+                name: bookingState.name,
+                guests: bookingState.guests,
+                individualOrders: bookingState.individualOrders,
+                tableType: bookingState.tableType.type,
+                totalPrice: bookingState.totalPrice
+            };
+            
+            try {
+                const result = await api.createBooking(bookingData);
+                
+                if (result.success) {
+                    // Aggiungi alla lista locale per aggiornamento immediato UI
+                    participants.push({
+                        ...bookingData,
+                        id: result.booking.id,
+                        timestamp: result.booking.createdAt
+                    });
+                    
+                    const successMessage = document.getElementById('success-message');
+                    document.getElementById('final-total').textContent = bookingState.totalPrice.toFixed(2);
+                    successMessage.style.display = 'block';
+                    this.disabled = true;
+                    this.textContent = 'PRENOTAZIONE CONFERMATA ✅';
+                    
+                    // Aggiorna contatori
+                    updateAvailabilityCounter();
+                    updateAdminStats();
+                    updateParticipantsList();
+                    
+                    successMessage.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert('Errore durante la prenotazione: ' + (result.message || 'Errore sconosciuto'));
+                }
+            } catch (error) {
+                console.error('Errore prenotazione:', error);
+                alert('Errore durante la prenotazione. Riprova.');
+            }
+        });
+
+        // Gestione download riepilogo
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.id === 'download-summary') {
+                downloadSummary();
+            }
+        });
+
+        // Funzioni di esportazione Excel
+        async function exportBookingsToExcel() {
+            try {
+                // Recupera i dati delle prenotazioni
+                const result = await api.getBookings();
+                if (!result.success) {
+                    alert('Errore nel recupero dei dati delle prenotazioni');
+                    return;
+                }
+
+                const bookings = result.bookings || [];
+                
+                // Prepara i dati per l'Excel
+                const excelData = bookings.map(booking => {
+                    const individualOrders = booking.individual_orders || [];
+                    
+                    // Estrai pizze e fritti
+                    let allPizzas = [];
+                    let allFritti = [];
+                    
+                    individualOrders.forEach(order => {
+                        if (order.selectedPizzas) {
+                            order.selectedPizzas.forEach(pizza => {
+                                let pizzaName = pizza.item.name;
+                                let variants = [];
+                                
+                                if (order.pizzaVariants && order.pizzaVariants[pizza.index]) {
+                                    if (order.pizzaVariants[pizza.index].noGluten) variants.push('senza glutine');
+                                    if (order.pizzaVariants[pizza.index].noLactose) variants.push('senza lattosio');
+                                }
+                                
+                                if (variants.length > 0) {
+                                    pizzaName += ` (${variants.join(', ')})`;
+                                }
+                                
+                                allPizzas.push(pizzaName);
+                            });
+                        }
+                        
+                        if (order.selectedFritti) {
+                            order.selectedFritti.forEach(fritto => {
+                                allFritti.push(fritto.item.name);
+                            });
+                        }
+                    });
+                    
+                    return {
+                        'Nome Partecipante': booking.name,
+                        'Tavolo': booking.table_type === 'pool' ? 'Condominiale' : 'Personale',
+                        'Numero Persone': booking.guests,
+                        'Lista Pizze Scelte': allPizzas.join(', ') || 'Nessuna',
+                        'Lista Fritti Scelti': allFritti.join(', ') || 'Nessuno',
+                        'Totale €': booking.total_price?.toFixed(2) || '0.00',
+                        'Data Prenotazione': new Date(booking.booking_date).toLocaleDateString('it-IT')
+                    };
+                });
+                
+                // Crea il workbook
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.json_to_sheet(excelData);
+                
+                // Imposta la larghezza delle colonne
+                const colWidths = [
+                    { wch: 20 }, // Nome Partecipante
+                    { wch: 15 }, // Tavolo
+                    { wch: 15 }, // Numero Persone
+                    { wch: 40 }, // Lista Pizze
+                    { wch: 40 }, // Lista Fritti
+                    { wch: 12 }, // Totale
+                    { wch: 18 }  // Data
+                ];
+                ws['!cols'] = colWidths;
+                
+                XLSX.utils.book_append_sheet(wb, ws, 'Prenotazioni');
+                
+                // Scarica il file
+                XLSX.writeFile(wb, 'riepilogo_prenotazioni.xlsx');
+                
+                alert('✅ File riepilogo_prenotazioni.xlsx scaricato con successo!');
+                
+            } catch (error) {
+                console.error('Errore esportazione prenotazioni:', error);
+                alert('❌ Errore durante l\'esportazione delle prenotazioni');
+            }
+        }
+
+        async function exportMenuSummaryToExcel() {
+            try {
+                // Recupera i dati delle prenotazioni
+                const result = await api.getBookings();
+                if (!result.success) {
+                    alert('Errore nel recupero dei dati delle prenotazioni');
+                    return;
+                }
+
+                const bookings = result.bookings || [];
+                
+                // Contatori per pizze e fritti
+                const pizzaCount = {};
+                const frittoCount = {};
+                
+                // Analizza tutte le prenotazioni
+                bookings.forEach(booking => {
+                    const individualOrders = booking.individual_orders || [];
+                    
+                    individualOrders.forEach(order => {
+                        // Conta pizze
+                        if (order.selectedPizzas) {
+                            order.selectedPizzas.forEach(pizza => {
+                                let pizzaName = pizza.item.name;
+                                let variants = [];
+                                
+                                if (order.pizzaVariants && order.pizzaVariants[pizza.index]) {
+                                    if (order.pizzaVariants[pizza.index].noGluten) variants.push('senza glutine');
+                                    if (order.pizzaVariants[pizza.index].noLactose) variants.push('senza lattosio');
+                                }
+                                
+                                if (variants.length > 0) {
+                                    pizzaName += ` (${variants.join(', ')})`;
+                                }
+                                
+                                pizzaCount[pizzaName] = (pizzaCount[pizzaName] || 0) + 1;
+                            });
+                        }
+                        
+                        // Conta fritti
+                        if (order.selectedFritti) {
+                            order.selectedFritti.forEach(fritto => {
+                                const frittoName = fritto.item.name;
+                                frittoCount[frittoName] = (frittoCount[frittoName] || 0) + 1;
+                            });
+                        }
+                    });
+                });
+                
+                // Prepara dati per Excel
+                const pizzaData = Object.entries(pizzaCount)
+                    .sort((a, b) => b[1] - a[1]) // Ordina per quantità decrescente
+                    .map(([pizza, count]) => ({
+                        'Tipo Pizza': pizza,
+                        'Quantità': count
+                    }));
+                
+                const frittoData = Object.entries(frittoCount)
+                    .sort((a, b) => b[1] - a[1]) // Ordina per quantità decrescente
+                    .map(([fritto, count]) => ({
+                        'Tipo Fritto': fritto,
+                        'Quantità': count
+                    }));
+                
+                // Crea il workbook
+                const wb = XLSX.utils.book_new();
+                
+                // Foglio Pizze
+                if (pizzaData.length > 0) {
+                    const wsPizzas = XLSX.utils.json_to_sheet(pizzaData);
+                    wsPizzas['!cols'] = [{ wch: 30 }, { wch: 12 }];
+                    XLSX.utils.book_append_sheet(wb, wsPizzas, 'Riepilogo Pizze');
+                }
+                
+                // Foglio Fritti
+                if (frittoData.length > 0) {
+                    const wsFritti = XLSX.utils.json_to_sheet(frittoData);
+                    wsFritti['!cols'] = [{ wch: 30 }, { wch: 12 }];
+                    XLSX.utils.book_append_sheet(wb, wsFritti, 'Riepilogo Fritti');
+                }
+                
+                // Se non ci sono dati, crea un foglio vuoto
+                if (pizzaData.length === 0 && frittoData.length === 0) {
+                    const wsEmpty = XLSX.utils.json_to_sheet([{
+                        'Messaggio': 'Nessun ordine presente'
+                    }]);
+                    XLSX.utils.book_append_sheet(wb, wsEmpty, 'Riepilogo');
+                }
+                
+                // Scarica il file
+                XLSX.writeFile(wb, 'riepilogo_menu.xlsx');
+                
+                alert('✅ File riepilogo_menu.xlsx scaricato con successo!');
+                
+            } catch (error) {
+                console.error('Errore esportazione menu:', error);
+                alert('❌ Errore durante l\'esportazione del riepilogo menu');
+            }
+        }
+
+        // Event listener per Enter nel campo password
+        document.getElementById('admin-password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+
+        // Inizializzazione
+        window.addEventListener('DOMContentLoaded', async function() {
+            renderReferenceMenu();
+            updateSummary();
+            
+            // Carica menu dal backend
+            try {
+                await loadMenuFromBackend();
+            } catch (error) {
+                console.log('Usando menu di default (backend non disponibile)');
+            }
+            
+            // Carica statistiche pubbliche
+            try {
+                const stats = await api.getStats();
+                if (stats.success) {
+                    // Aggiorna contatore posti disponibili
+                    const availableSpots = Math.max(0, MAX_SPOTS - stats.data.totalParticipants);
+                    const spotsCounterEl = document.getElementById('spots-counter');
+                    if (spotsCounterEl) {
+                        spotsCounterEl.textContent = availableSpots;
+                    }
+                }
+            } catch (error) {
+                console.log('Statistiche non disponibili (backend non disponibile)');
+            }
+            
+            updateAvailabilityCounter();
+        });
+    </script>
+</body>
+</html>

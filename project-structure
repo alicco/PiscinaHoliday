@@ -1,0 +1,33 @@
+festa-piscina/
+├── backend/
+│   ├── config/
+│   │   ├── database.js
+│   │   └── email.js
+│   ├── controllers/
+│   │   ├── authController.js
+│   │   ├── bookingController.js
+│   │   └── menuController.js
+│   ├── middleware/
+│   │   ├── auth.js
+│   │   ├── validation.js
+│   │   └── rateLimiter.js
+│   ├── models/
+│   │   ├── Booking.js
+│   │   ├── Menu.js
+│   │   └── User.js
+│   ├── routes/
+│   │   ├── auth.js
+│   │   ├── bookings.js
+│   │   └── menu.js
+│   ├── utils/
+│   │   ├── emailTemplates.js
+│   │   └── helpers.js
+│   ├── app.js
+│   └── server.js
+├── frontend/
+│   └── festa-piscina-modificato.html
+├── database/
+│   └── festa_piscina.db
+├── .env
+├── .gitignore
+└── package.json
