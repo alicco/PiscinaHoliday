@@ -1,37 +1,27 @@
-const { db } = require('../config/database');
+const { pool } = require('../config/database');
 
 const calculateTotalPrice = async (individualOrders, guests = 0) => {
   if (!individualOrders || !Array.isArray(individualOrders)) {
     return guests * 3; // Solo quota bagnina se non ci sono ordini
   }
 
-  // Ottieni menu correnti dal database
-  const [pizzaMenu, frittiMenu] = await Promise.all([
-    new Promise((resolve, reject) => {
-      db.all('SELECT * FROM pizza_menu WHERE active = 1', (err, rows) => {
-        if (err) reject(err);
-        else resolve(rows);
-      });
-    }),
-    new Promise((resolve, reject) => {
-      db.all('SELECT * FROM fritti_menu WHERE active = 1', (err, rows) => {
-        if (err) reject(err);
-        else resolve(rows);
-      });
-    })
+  const [pizzaResult, frittiResult] = await Promise.all([
+    pool.query('SELECT * FROM pizza_menu WHERE active = TRUE'),
+    pool.query('SELECT * FROM fritti_menu WHERE active = TRUE')
   ]);
+
+  const pizzaMenu = pizzaResult.rows;
+  const frittiMenu = frittiResult.rows;
 
   let total = 0;
 
   individualOrders.forEach(order => {
-    // Calcola prezzo pizze
     if (order.selectedPizzas && Array.isArray(order.selectedPizzas)) {
       order.selectedPizzas.forEach(pizza => {
         const menuItem = pizzaMenu.find(p => p.id === pizza.item.id || p.name === pizza.item.name);
         if (menuItem) {
           let pizzaPrice = menuItem.price;
           
-          // Aggiungi costo varianti
           if (order.pizzaVariants && order.pizzaVariants[pizza.index]) {
             if (order.pizzaVariants[pizza.index].noGluten) pizzaPrice += 2;
             if (order.pizzaVariants[pizza.index].noLactose) pizzaPrice += 1.5;
@@ -42,7 +32,6 @@ const calculateTotalPrice = async (individualOrders, guests = 0) => {
       });
     }
 
-    // Calcola prezzo fritti
     if (order.selectedFritti && Array.isArray(order.selectedFritti)) {
       order.selectedFritti.forEach(fritto => {
         const menuItem = frittiMenu.find(f => f.id === fritto.item.id || f.name === fritto.item.name);
@@ -53,7 +42,6 @@ const calculateTotalPrice = async (individualOrders, guests = 0) => {
     }
   });
 
-  // Aggiungi quota bagnina: 3€ per partecipante
   const quotaBagnina = guests * 3;
   total += quotaBagnina;
 

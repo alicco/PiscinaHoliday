@@ -1,20 +1,14 @@
-const { db } = require('../config/database');
+const { pool } = require('../config/database');
 
 const getPizzaMenu = async (req, res) => {
   try {
-    const pizzas = await new Promise((resolve, reject) => {
-      db.all(`
-        SELECT id, name, description, price, emoji, active, sort_order
-        FROM pizza_menu 
-        WHERE active = 1 
-        ORDER BY sort_order, id
-      `, (err, rows) => {
-        if (err) reject(err);
-        else resolve(rows);
-      });
-    });
-
-    res.json(pizzas);
+    const result = await pool.query(
+      `SELECT id, name, description, price, emoji, active, sort_order
+       FROM pizza_menu 
+       WHERE active = TRUE 
+       ORDER BY sort_order, id`
+    );
+    res.json(result.rows);
   } catch (error) {
     console.error('Errore recupero menu pizze:', error);
     res.status(500).json({ error: 'Errore interno del server' });
@@ -23,19 +17,13 @@ const getPizzaMenu = async (req, res) => {
 
 const getFrittiMenu = async (req, res) => {
   try {
-    const fritti = await new Promise((resolve, reject) => {
-      db.all(`
-        SELECT id, name, description, price, emoji, active, sort_order
-        FROM fritti_menu 
-        WHERE active = 1 
-        ORDER BY sort_order, id
-      `, (err, rows) => {
-        if (err) reject(err);
-        else resolve(rows);
-      });
-    });
-
-    res.json(fritti);
+    const result = await pool.query(
+      `SELECT id, name, description, price, emoji, active, sort_order
+       FROM fritti_menu 
+       WHERE active = TRUE 
+       ORDER BY sort_order, id`
+    );
+    res.json(result.rows);
   } catch (error) {
     console.error('Errore recupero menu fritti:', error);
     res.status(500).json({ error: 'Errore interno del server' });
@@ -44,22 +32,12 @@ const getFrittiMenu = async (req, res) => {
 
 const getFullMenu = async (req, res) => {
   try {
-    const [pizzas, fritti] = await Promise.all([
-      new Promise((resolve, reject) => {
-        db.all('SELECT * FROM pizza_menu WHERE active = 1 ORDER BY sort_order, id', (err, rows) => {
-          if (err) reject(err);
-          else resolve(rows);
-        });
-      }),
-      new Promise((resolve, reject) => {
-        db.all('SELECT * FROM fritti_menu WHERE active = 1 ORDER BY sort_order, id', (err, rows) => {
-          if (err) reject(err);
-          else resolve(rows);
-        });
-      })
+    const [pizzaResult, frittiResult] = await Promise.all([
+      pool.query('SELECT * FROM pizza_menu WHERE active = TRUE ORDER BY sort_order, id'),
+      pool.query('SELECT * FROM fritti_menu WHERE active = TRUE ORDER BY sort_order, id')
     ]);
 
-    res.json({ pizzas, fritti });
+    res.json({ pizzas: pizzaResult.rows, fritti: frittiResult.rows });
   } catch (error) {
     console.error('Errore recupero menu completo:', error);
     res.status(500).json({ error: 'Errore interno del server' });
@@ -67,6 +45,7 @@ const getFullMenu = async (req, res) => {
 };
 
 const updatePizzaMenu = async (req, res) => {
+  const client = await pool.connect();
   try {
     const { pizzas } = req.body;
 
@@ -74,74 +53,41 @@ const updatePizzaMenu = async (req, res) => {
       return res.status(400).json({ error: 'Menu pizze deve essere un array' });
     }
 
-    // Inizia transazione
-    await new Promise((resolve, reject) => {
-      db.run('BEGIN TRANSACTION', (err) => {
-        if (err) reject(err);
-        else resolve();
-      });
-    });
+    await client.query('BEGIN');
 
-    try {
-      // Disattiva tutti gli elementi esistenti
-      await new Promise((resolve, reject) => {
-        db.run('UPDATE pizza_menu SET active = 0', (err) => {
-          if (err) reject(err);
-          else resolve();
-        });
-      });
+    await client.query('UPDATE pizza_menu SET active = FALSE');
 
-      // Inserisci/aggiorna nuovi elementi
-      const stmt = db.prepare(`
-        INSERT OR REPLACE INTO pizza_menu (id, name, description, price, emoji, active, sort_order)
-        VALUES (?, ?, ?, ?, ?, 1, ?)
-      `);
-
-      for (let i = 0; i < pizzas.length; i++) {
-        const pizza = pizzas[i];
-        await new Promise((resolve, reject) => {
-          stmt.run(
-            pizza.id || null,
-            pizza.name,
-            pizza.description,
-            pizza.price,
-            pizza.emoji,
-            i,
-            (err) => {
-              if (err) reject(err);
-              else resolve();
-            }
-          );
-        });
-      }
-
-      stmt.finalize();
-
-      // Commit transazione
-      await new Promise((resolve, reject) => {
-        db.run('COMMIT', (err) => {
-          if (err) reject(err);
-          else resolve();
-        });
-      });
-
-      res.json({ success: true, message: 'Menu pizze aggiornato' });
-
-    } catch (error) {
-      // Rollback in caso di errore
-      await new Promise((resolve) => {
-        db.run('ROLLBACK', () => resolve());
-      });
-      throw error;
+    for (let i = 0; i < pizzas.length; i++) {
+      const pizza = pizzas[i];
+      await client.query(
+        `INSERT INTO pizza_menu (id, name, description, price, emoji, active, sort_order)
+         VALUES ($1, $2, $3, $4, $5, TRUE, $6)
+         ON CONFLICT (id) DO UPDATE SET
+           name = EXCLUDED.name,
+           description = EXCLUDED.description,
+           price = EXCLUDED.price,
+           emoji = EXCLUDED.emoji,
+           active = EXCLUDED.active,
+           sort_order = EXCLUDED.sort_order`,
+        [pizza.id || null, pizza.name, pizza.description, pizza.price, pizza.emoji, i]
+      );
     }
 
+    await client.query('COMMIT');
+
+    res.json({ success: true, message: 'Menu pizze aggiornato' });
+
   } catch (error) {
+    await client.query('ROLLBACK');
     console.error('Errore aggiornamento menu pizze:', error);
     res.status(500).json({ error: 'Errore interno del server' });
+  } finally {
+    client.release();
   }
 };
 
 const updateFrittiMenu = async (req, res) => {
+  const client = await pool.connect();
   try {
     const { fritti } = req.body;
 
@@ -149,66 +95,36 @@ const updateFrittiMenu = async (req, res) => {
       return res.status(400).json({ error: 'Menu fritti deve essere un array' });
     }
 
-    // Logica simile a updatePizzaMenu ma per fritti_menu
-    await new Promise((resolve, reject) => {
-      db.run('BEGIN TRANSACTION', (err) => {
-        if (err) reject(err);
-        else resolve();
-      });
-    });
+    await client.query('BEGIN');
 
-    try {
-      await new Promise((resolve, reject) => {
-        db.run('UPDATE fritti_menu SET active = 0', (err) => {
-          if (err) reject(err);
-          else resolve();
-        });
-      });
+    await client.query('UPDATE fritti_menu SET active = FALSE');
 
-      const stmt = db.prepare(`
-        INSERT OR REPLACE INTO fritti_menu (id, name, description, price, emoji, active, sort_order)
-        VALUES (?, ?, ?, ?, ?, 1, ?)
-      `);
-
-      for (let i = 0; i < fritti.length; i++) {
-        const fritto = fritti[i];
-        await new Promise((resolve, reject) => {
-          stmt.run(
-            fritto.id || null,
-            fritto.name,
-            fritto.description,
-            fritto.price,
-            fritto.emoji,
-            i,
-            (err) => {
-              if (err) reject(err);
-              else resolve();
-            }
-          );
-        });
-      }
-
-      stmt.finalize();
-
-      await new Promise((resolve, reject) => {
-        db.run('COMMIT', (err) => {
-          if (err) reject(err);
-          else resolve();
-        });
-      });
-
-      res.json({ success: true, message: 'Menu fritti aggiornato' });
-
-    } catch (error) {
-      await new Promise((resolve) => {
-        db.run('ROLLBACK', () => resolve());
-      });
-      throw error;
+    for (let i = 0; i < fritti.length; i++) {
+      const fritto = fritti[i];
+      await client.query(
+        `INSERT INTO fritti_menu (id, name, description, price, emoji, active, sort_order)
+         VALUES ($1, $2, $3, $4, $5, TRUE, $6)
+         ON CONFLICT (id) DO UPDATE SET
+           name = EXCLUDED.name,
+           description = EXCLUDED.description,
+           price = EXCLUDED.price,
+           emoji = EXCLUDED.emoji,
+           active = EXCLUDED.active,
+           sort_order = EXCLUDED.sort_order`,
+        [fritto.id || null, fritto.name, fritto.description, fritto.price, fritto.emoji, i]
+      );
     }
 
+    await client.query('COMMIT');
+
+    res.json({ success: true, message: 'Menu fritti aggiornato' });
+
   } catch (error) {
+    await client.query('ROLLBACK');
     console.error('Errore aggiornamento menu fritti:', error);
     res.status(500).json({ error: 'Errore interno del server' });
+  } finally {
+    client.release();
   }
 };
 

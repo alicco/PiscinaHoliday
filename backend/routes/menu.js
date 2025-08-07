@@ -29,30 +29,19 @@ router.put('/fritti', updateFrittiMenu);
 router.post('/pizzas', validateMenuItem, async (req, res) => {
   try {
     const { name, description, price, emoji } = req.body;
-    const { db } = require('../config/database');
+    const { pool } = require('../config/database');
 
-    // Ottieni prossimo sort_order
-    const maxOrder = await new Promise((resolve, reject) => {
-      db.get('SELECT MAX(sort_order) as max_order FROM pizza_menu', (err, row) => {
-        if (err) reject(err);
-        else resolve(row.max_order || 0);
-      });
-    });
+    const maxOrderResult = await pool.query('SELECT MAX(sort_order) as max_order FROM pizza_menu');
+    const maxOrder = maxOrderResult.rows[0].max_order || 0;
 
-    const result = await new Promise((resolve, reject) => {
-      db.run(
-        'INSERT INTO pizza_menu (name, description, price, emoji, sort_order) VALUES (?, ?, ?, ?, ?)',
-        [name, description, price, emoji, maxOrder + 1],
-        function(err) {
-          if (err) reject(err);
-          else resolve({ id: this.lastID });
-        }
-      );
-    });
+    const result = await pool.query(
+      'INSERT INTO pizza_menu (name, description, price, emoji, sort_order) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+      [name, description, price, emoji, maxOrder + 1]
+    );
 
     res.status(201).json({ 
       success: true, 
-      id: result.id, 
+      id: result.rows[0].id, 
       message: 'Pizza aggiunta al menu' 
     });
 
@@ -62,33 +51,22 @@ router.post('/pizzas', validateMenuItem, async (req, res) => {
   }
 });
 
-// Aggiungi singolo fritto
 router.post('/fritti', validateMenuItem, async (req, res) => {
   try {
     const { name, description, price, emoji } = req.body;
-    const { db } = require('../config/database');
+    const { pool } = require('../config/database');
 
-    const maxOrder = await new Promise((resolve, reject) => {
-      db.get('SELECT MAX(sort_order) as max_order FROM fritti_menu', (err, row) => {
-        if (err) reject(err);
-        else resolve(row.max_order || 0);
-      });
-    });
+    const maxOrderResult = await pool.query('SELECT MAX(sort_order) as max_order FROM fritti_menu');
+    const maxOrder = maxOrderResult.rows[0].max_order || 0;
 
-    const result = await new Promise((resolve, reject) => {
-      db.run(
-        'INSERT INTO fritti_menu (name, description, price, emoji, sort_order) VALUES (?, ?, ?, ?, ?)',
-        [name, description, price, emoji, maxOrder + 1],
-        function(err) {
-          if (err) reject(err);
-          else resolve({ id: this.lastID });
-        }
-      );
-    });
+    const result = await pool.query(
+      'INSERT INTO fritti_menu (name, description, price, emoji, sort_order) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+      [name, description, price, emoji, maxOrder + 1]
+    );
 
     res.status(201).json({ 
       success: true, 
-      id: result.id, 
+      id: result.rows[0].id, 
       message: 'Fritto aggiunto al menu' 
     });
 

@@ -47,20 +47,14 @@ router.patch('/:id/payment', async (req, res) => {
       return res.status(400).json({ error: 'Stato pagamento non valido' });
     }
 
-    const { db } = require('../config/database');
+    const { pool } = require('../config/database');
     
-    const result = await new Promise((resolve, reject) => {
-      db.run(
-        'UPDATE bookings SET payment_status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-        [status, id],
-        function(err) {
-          if (err) reject(err);
-          else resolve({ changes: this.changes });
-        }
-      );
-    });
+    const result = await pool.query(
+      'UPDATE bookings SET payment_status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING id',
+      [status, id]
+    );
 
-    if (result.changes === 0) {
+    if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Prenotazione non trovata' });
     }
 
