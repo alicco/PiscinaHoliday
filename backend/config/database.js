@@ -2,7 +2,7 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
 
-const dbPath = process.env.DB_PATH || './database/festa_piscina.db';
+const dbPath = process.env.DB_PATH || '/tmp/festa_piscina.db';
 const dbDir = path.dirname(dbPath);
 
 // Crea la directory del database se non esiste

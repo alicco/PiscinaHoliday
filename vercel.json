@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "backend/server.js", "use": "@vercel/node" },
+    { "src": "festa-piscina-modificato.html", "use": "@vercel/static" },
+    { "src": "frontend-api-integration.js", "use": "@vercel/static" },
+    { "src": "piscina.jpg", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/backend/server.js" },
+    { "src": "/", "dest": "/festa-piscina-modificato.html" }
+  ]
+}
