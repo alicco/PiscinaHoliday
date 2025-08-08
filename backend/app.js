@@ -45,6 +45,20 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Database health check
+app.get('/api/db-health', async (req, res) => {
+  const { pool } = require('./config/database');
+  try {
+    const client = await pool.connect();
+    await client.query('SELECT 1');
+    client.release();
+    res.json({ status: 'Database OK', timestamp: new Date().toISOString() });
+  } catch (error) {
+    console.error('Database health check failed:', error);
+    res.status(500).json({ status: 'Database Error', message: error.message });
+  }
+});
+
 // Error handling
 app.use((err, req, res, next) => {
   console.error('❌ Error:', err);

@@ -1,1 +1,1 @@
-Hardcoded parametri DB per debug
+Aggiunti log dettagliati e endpoint db-health

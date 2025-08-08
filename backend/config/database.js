@@ -1,23 +1,21 @@
 const { Pool } = require('pg');
 
-// DEBUG: Hardcoded connection parameters for testing
+console.log('DEBUG: Initializing pg Pool...');
+console.log('DEBUG: process.env.DATABASE_URL is:', process.env.DATABASE_URL);
+
 const pool = new Pool({
-  user: 'postgres',
-  host: 'db.btqthnnecgzkhlpdixdd.supabase.co',
-  database: 'postgres',
-  password: '4275142Ss.!',
-  port: 5432,
+  connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false // Necessario per Supabase su Vercel
   }
 });
 
-console.log('DEBUG: Pool created with hardcoded parameters.');
+console.log('DEBUG: Pool instance created.');
 
 const initializeDatabase = async () => {
-  console.log('Attempting to initialize database...');
+  console.log('DEBUG: Attempting to initialize database tables...');
   try {
-    console.log('Creating users table...');
+    console.log('DEBUG: Creating users table...');
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -27,9 +25,9 @@ const initializeDatabase = async () => {
         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
       )
     `);
-    console.log('Users table created/verified.');
+    console.log('DEBUG: Users table created/verified.');
 
-    console.log('Creating bookings table...');
+    console.log('DEBUG: Creating bookings table...');
     await pool.query(`
       CREATE TABLE IF NOT EXISTS bookings (
         id SERIAL PRIMARY KEY,
@@ -45,9 +43,9 @@ const initializeDatabase = async () => {
         updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
       )
     `);
-    console.log('Bookings table created/verified.');
+    console.log('DEBUG: Bookings table created/verified.');
 
-    console.log('Creating pizza_menu table...');
+    console.log('DEBUG: Creating pizza_menu table...');
     await pool.query(`
       CREATE TABLE IF NOT EXISTS pizza_menu (
         id SERIAL PRIMARY KEY,
@@ -59,9 +57,9 @@ const initializeDatabase = async () => {
         sort_order INTEGER DEFAULT 0
       )
     `);
-    console.log('Pizza menu table created/verified.');
+    console.log('DEBUG: Pizza menu table created/verified.');
 
-    console.log('Creating fritti_menu table...');
+    console.log('DEBUG: Creating fritti_menu table...');
     await pool.query(`
       CREATE TABLE IF NOT EXISTS fritti_menu (
         id SERIAL PRIMARY KEY,
@@ -73,9 +71,9 @@ const initializeDatabase = async () => {
         sort_order INTEGER DEFAULT 0
       )
     `);
-    console.log('Fritti menu table created/verified.');
+    console.log('DEBUG: Fritti menu table created/verified.');
 
-    console.log('Inserting default menu items...');
+    console.log('DEBUG: Inserting default menu items...');
     await insertDefaultMenu();
     console.log('✅ Database initialized successfully');
   } catch (err) {
