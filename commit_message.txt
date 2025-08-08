@@ -1,1 +1,1 @@
-Ripristinato server.js per Docker
+Rimosso dotenv da app.js
