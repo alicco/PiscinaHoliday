@@ -1,1 +1,1 @@
-Aggiunto log per DATABASE_URL in database.js (forzato)
+Aggiunto log DATABASE_URL all'inizio di server.js

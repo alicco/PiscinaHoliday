@@ -1,3 +1,4 @@
+console.log('DEBUG (server.js): process.env.DATABASE_URL at start:', process.env.DATABASE_URL);
 const app = require('./app');
 const { initializeDatabase } = require('./config/database');
 
