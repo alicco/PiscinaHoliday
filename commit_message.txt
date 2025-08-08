@@ -1,1 +1,1 @@
-Aggiunto log di avvio server
+Adattato server.js per ambiente serverless

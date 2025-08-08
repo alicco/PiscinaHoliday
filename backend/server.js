@@ -2,18 +2,23 @@ console.log('Server starting...');
 const app = require('./app');
 const { initializeDatabase } = require('./config/database');
 
-const PORT = process.env.PORT || 3000;
+// Inizializza il database una volta all'avvio della funzione serverless
+let isInitialized = false;
 
-// Inizializza il database
-initializeDatabase()
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`📱 Frontend: http://localhost:3001`);
-      console.log(`🔧 API: http://localhost:${PORT}/api`);
-    });
-  })
-  .catch(err => {
-    console.error('❌ Failed to initialize database:', err);
-    process.exit(1);
-  });
+module.exports = async (req, res) => {
+  if (!isInitialized) {
+    try {
+      console.log('Initializing database for serverless function...');
+      await initializeDatabase();
+      isInitialized = true;
+      console.log('Database initialized for serverless function.');
+    } catch (err) {
+      console.error('❌ Failed to initialize database in serverless function:', err);
+      // Non uscire dal processo, ma invia un errore al client
+      res.status(500).send('Server initialization failed.');
+      return;
+    }
+  }
+  // Passa la richiesta all'app Express
+  app(req, res);
+};
