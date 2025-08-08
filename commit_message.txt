@@ -1,1 +1,1 @@
-Usati parametri espliciti per connessione DB
+Isolato crash pool pg

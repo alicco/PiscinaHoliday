@@ -13,6 +13,8 @@ const pool = new Pool({
   }
 });
 
+console.log('DEBUG: Pool created successfully.');
+
 const initializeDatabase = async () => {
   console.log('Attempting to initialize database...');
   try {
