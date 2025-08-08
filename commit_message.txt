@@ -1,1 +1,1 @@
-Isolato crash pool pg
+Hardcoded parametri DB per debug

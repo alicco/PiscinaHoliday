@@ -1,7 +1,6 @@
 const { Pool } = require('pg');
 
-console.log('DEBUG: process.env.DATABASE_URL is:', process.env.DATABASE_URL);
-
+// DEBUG: Hardcoded connection parameters for testing
 const pool = new Pool({
   user: 'postgres',
   host: 'db.btqthnnecgzkhlpdixdd.supabase.co',
@@ -13,9 +12,7 @@ const pool = new Pool({
   }
 });
 
-console.log('DEBUG: Pool created successfully.');
-
-console.log('DEBUG: Pool created successfully.');
+console.log('DEBUG: Pool created with hardcoded parameters.');
 
 const initializeDatabase = async () => {
   console.log('Attempting to initialize database...');
