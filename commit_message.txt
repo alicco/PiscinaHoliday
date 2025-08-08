@@ -1,1 +1,1 @@
-Adattato server.js per ambiente serverless
+Server.js minimale per debug log
