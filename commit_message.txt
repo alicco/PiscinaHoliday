@@ -1,1 +1,1 @@
-Specificata versione Node.js nel package.json
+Ripristinato server.js per Docker
