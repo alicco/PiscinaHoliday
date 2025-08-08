@@ -1,1 +1,1 @@
-Server.js minimale per debug log
+Specificata versione Node.js nel package.json

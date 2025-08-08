@@ -2,6 +2,9 @@
   "name": "festa-piscina-backend",
   "version": "1.0.0",
   "description": "Backend per sistema prenotazioni festa piscina",
+  "engines": {
+    "node": "18.x"
+  },
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",
