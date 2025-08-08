@@ -1,1 +1,1 @@
-Aggiunti log dettagliati per debug database
+Aggiunto log di avvio server

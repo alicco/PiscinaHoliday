@@ -1,3 +1,4 @@
+console.log('Server starting...');
 const app = require('./app');
 const { initializeDatabase } = require('./config/database');
 
