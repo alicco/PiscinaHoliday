@@ -8,7 +8,9 @@ const pool = new Pool({
 });
 
 const initializeDatabase = async () => {
+  console.log('Attempting to initialize database...');
   try {
+    console.log('Creating users table...');
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -18,7 +20,9 @@ const initializeDatabase = async () => {
         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
       )
     `);
+    console.log('Users table created/verified.');
 
+    console.log('Creating bookings table...');
     await pool.query(`
       CREATE TABLE IF NOT EXISTS bookings (
         id SERIAL PRIMARY KEY,
@@ -34,7 +38,9 @@ const initializeDatabase = async () => {
         updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
       )
     `);
+    console.log('Bookings table created/verified.');
 
+    console.log('Creating pizza_menu table...');
     await pool.query(`
       CREATE TABLE IF NOT EXISTS pizza_menu (
         id SERIAL PRIMARY KEY,
@@ -46,7 +52,9 @@ const initializeDatabase = async () => {
         sort_order INTEGER DEFAULT 0
       )
     `);
+    console.log('Pizza menu table created/verified.');
 
+    console.log('Creating fritti_menu table...');
     await pool.query(`
       CREATE TABLE IF NOT EXISTS fritti_menu (
         id SERIAL PRIMARY KEY,
@@ -58,7 +66,9 @@ const initializeDatabase = async () => {
         sort_order INTEGER DEFAULT 0
       )
     `);
+    console.log('Fritti menu table created/verified.');
 
+    console.log('Inserting default menu items...');
     await insertDefaultMenu();
     console.log('✅ Database initialized successfully');
   } catch (err) {

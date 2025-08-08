@@ -1,1 +1,1 @@
-Aggiornati tutti i file del backend per PostgreSQL
+Aggiunti log dettagliati per debug database
