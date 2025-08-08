@@ -3,7 +3,11 @@ const { Pool } = require('pg');
 console.log('DEBUG: process.env.DATABASE_URL is:', process.env.DATABASE_URL);
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  user: 'postgres',
+  host: 'db.btqthnnecgzkhlpdixdd.supabase.co',
+  database: 'postgres',
+  password: '4275142Ss.!',
+  port: 5432,
   ssl: {
     rejectUnauthorized: false // Necessario per Supabase su Vercel
   }
