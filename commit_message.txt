@@ -1,1 +1,1 @@
-Rimosso dotenv da app.js
+Aggiunto log per DATABASE_URL in database.js
