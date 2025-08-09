@@ -28,6 +28,11 @@ const api = {
     return await response.json();
   },
 
+  async getAvailableSpots() {
+    const response = await fetch(`${API_BASE_URL}/bookings/available-spots`);
+    return await response.json();
+  },
+
   async getBookings() {
     const response = await fetch(`${API_BASE_URL}/bookings`, {
       headers: { 'Authorization': `Bearer ${authToken}` }

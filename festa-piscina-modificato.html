@@ -921,8 +921,8 @@
                 </div>
                 <div class="form-group">
                     <label for="guests">Numero Ospiti *</label>
-                    <select id="guests">
-                        <option value="">Seleziona...</option>
+                    <select id="guests" disabled>
+                        <option value="">Caricamento menu...</option>
                         <option value="1">1 persona</option>
                         <option value="2">2 persone</option>
                         <option value="3">3 persone</option>
@@ -2371,32 +2371,60 @@ Ci vediamo alla festa! 🏊‍♀️🍕✨`;
 
         // Inizializzazione
         window.addEventListener('DOMContentLoaded', async function() {
-            renderReferenceMenu();
-            updateSummary();
-            
-            // Carica menu dal backend
+            const guestsSelect = document.getElementById('guests');
+            const tableOptions = document.querySelectorAll('.table-option');
+            const spotsCounterEl = document.getElementById('spots-counter');
+
+            // Disabilita i controlli principali all'inizio
+            guestsSelect.disabled = true;
+            tableOptions.forEach(opt => opt.style.pointerEvents = 'none');
+
             try {
-                await loadMenuFromBackend();
+                // Carica i dati essenziali dal backend in parallelo
+                const [menuResult, spotsResult] = await Promise.all([
+                    api.getMenu(),
+                    api.getAvailableSpots()
+                ]);
+
+                // Gestione Menu
+                if (menuResult.success) {
+                    pizzaMenu = menuResult.data.pizzas;
+                    frittiMenu = menuResult.data.fritti;
+                } else {
+                    throw new Error('Impossibile caricare il menu.');
+                }
+
+                // Gestione Posti Disponibili
+                if (spotsResult.availableSpots !== undefined) {
+                     if(spotsCounterEl) spotsCounterEl.textContent = spotsResult.availableSpots;
+                } else {
+                    console.warn('Dati posti disponibili non ricevuti.');
+                }
+
+                // Ora che i dati sono caricati, abilita i controlli
+                guestsSelect.disabled = false;
+                guestsSelect.querySelector('option').textContent = 'Seleziona...';
+                tableOptions.forEach(opt => opt.style.pointerEvents = 'auto');
+
+                // Aggiorna l'interfaccia con i dati freschi
+                renderReferenceMenu();
+                updateSummary();
+                updateAvailabilityCounter(); // Questa funzione ora userà i dati aggiornati
+
             } catch (error) {
-                console.log('Usando menu di default (backend non disponibile)');
-            }
-            
-            // Carica statistiche pubbliche
-            try {
-                const stats = await api.getStats();
-                if (stats.success) {
-                    // Aggiorna contatore posti disponibili
-                    const availableSpots = Math.max(0, MAX_SPOTS - stats.data.totalParticipants);
-                    const spotsCounterEl = document.getElementById('spots-counter');
-                    if (spotsCounterEl) {
-                        spotsCounterEl.textContent = availableSpots;
+                console.error('Errore critico durante l\'inizializzazione:', error);
+                guestsSelect.querySelector('option').textContent = 'Errore';
+                const container = document.querySelector('.booking-section');
+                if(container){
+                    let errorDiv = document.getElementById('init-error');
+                    if (!errorDiv) {
+                        errorDiv = document.createElement('div');
+                        errorDiv.id = 'init-error';
+                        errorDiv.innerHTML = '<p style="color: red; font-weight: bold; margin-top: 15px;">Impossibile caricare i dati necessari per la prenotazione. Riprova più tardi.</p>';
+                        container.appendChild(errorDiv);
                     }
                 }
-            } catch (error) {
-                console.log('Statistiche non disponibili (backend non disponibile)');
             }
-            
-            updateAvailabilityCounter();
         });
     </script>
 </body>
